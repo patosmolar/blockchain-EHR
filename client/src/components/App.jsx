@@ -8,7 +8,7 @@ import {
 import Home from "./Home";
 import UploadRecord from "./UploadRecord";
 import GetRecord from "./GetRecord";
-import Login from "./Loggin";
+import Login from "./Login";
 import Navigation from "./Navigation";
 
 
@@ -19,6 +19,7 @@ function App() {
         <Routes>
               <Route path ="/" element={<Home/>}/>
               <Route path ="/home" element={<Home/>}/>
+              <Route path ="/login" element={<Login/>}/>
               <Route path ="/uploadRecord" element={<UploadRecord/>}/>
               <Route path ="/getRecord" element={<GetRecord/>}/>
         </Routes>

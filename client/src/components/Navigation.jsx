@@ -11,6 +11,7 @@ function Navigation(){
                     <Nav.Link as={Link} to="/home">Home</Nav.Link>
                     <Nav.Link as={Link} to="/uploadRecord">Upload Record</Nav.Link>
                     <Nav.Link as={Link} to="/getRecord">Get Record</Nav.Link>
+                    <Nav.Link as={Link} to="/login">Login</Nav.Link>
                 </Nav>
             </Container>
         </Navbar>

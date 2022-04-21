@@ -1,20 +1,27 @@
-const main = async () => {
-  const IPFS = await hre.ethers.getContractFactory('IPFS');
-  const ipfs = await IPFS.deploy();
+const main = async() => {
+    const AccountsManager = await hre.ethers.getContractFactory('AccountsManager');
+    const aManager = await AccountsManager.deploy();
 
-  await ipfs.deployed();
+    await aManager.deployed();
 
-  console.log("IPFS  deployed to:", ipfs.address);
+    console.log("AccountsManager  deployed to:", aManager.address);
+
+    const MedicalRecords = await hre.ethers.getContractFactory('MedicalRecords');
+    const records = await MedicalRecords.deploy(aManager.address);
+
+    await records.deployed();
+
+    console.log("MedicalRecords  deployed to:", records.address);
 }
 
-const runMain = async () => {
-  try {
-    await main();
-    process.exit(0);
-  } catch (error) {
-    console.log(error);
-    process.exit(1);
-  }
+const runMain = async() => {
+    try {
+        await main();
+        process.exit(0);
+    } catch (error) {
+        console.log(error);
+        process.exit(1);
+    }
 }
 
 runMain();
