@@ -11,6 +11,7 @@ import UploadRecord from "./UploadRecord";
 import GetRecord from "./GetRecord";
 import Login from "./Login";
 import Navigation from "./Navigation";
+import Register from "./Register";
 
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
               <Route path ="/login" element={<Login/>}/>
               <Route path ="/uploadRecord" element={<UploadRecord/>}/>
               <Route path ="/getRecord" element={<GetRecord/>}/>
+              <Route path ="/register" element={<Register/>}/>
         </Routes>
       </BrowserRouter>
     </SmartContractsProvider>

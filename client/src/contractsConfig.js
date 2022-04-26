@@ -1,5 +1,5 @@
-export const accManagerAddress = "0x384f29aDe06c3b8addc8368E7bCB071470c20Fb1";
-export const medRecordsAddress = "0x98B3b55E8cbBa05D0e32046f006a117D009Df33f";
+export const accManagerAddress = "0xBe224F5a2d5ACA65Ae8F20DAb25b095c56463cBD";
+export const medRecordsAddress = "0xcA3922E372987e3E52305839075a7C5E3d1db14e";
 
 export const recordsABI = [{
         "inputs": [{
@@ -87,11 +87,59 @@ export const recordsABI = [{
     },
     {
         "inputs": [{
+            "internalType": "address",
+            "name": "addr",
+            "type": "address"
+        }],
+        "name": "getPublicKey",
+        "outputs": [{
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getTest",
+        "outputs": [{
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+        }],
+        "name": "publicKeys",
+        "outputs": [{
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
             "internalType": "string",
             "name": "publicKey",
             "type": "string"
         }],
         "name": "registerDevice",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "setTest",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

@@ -36,7 +36,18 @@ function UploadRecord() {
           });
         }
       }, [isLoading]);
+
+    useEffect(() => {
+        getPublicKeys();
+    }, []);
     
+    const getPublicKeys = async () => {
+        console.log(context.account);
+        let result = await context.recordsContract
+                                .getPublicKey(context.account);
+        console.log(result);
+    }
+
     const handleClick = () => setLoading(true);
 
     const uploadFile = ()  => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Web3 from "web3";
+import { ethers } from "ethers";
 import { Button, Card, Container } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {recordsABI, aManagerABI, accManagerAddress, medRecordsAddress} from "../contractsConfig.js";
@@ -9,6 +9,7 @@ import rsa from 'js-crypto-rsa';
 function Login() {
     const context = React.useContext(SmartContractsContext);
     const [isDeviceRegistered, setIsDeviceRegistered] = useState(false);
+    const { ethereum } = window;
 
     const checkIfRegistered = () => {
       if(localStorage.getItem("publicKey") != undefined && 
@@ -28,29 +29,42 @@ function Login() {
     const connectButtonHandler = async ()  => {
         // Asking if metamask is already present or not
         if (window.ethereum) {
-      
-          const web3 = new Web3("HTTP://127.0.0.1:7545");
-          const accounts = await web3.eth.getAccounts();
-          const records = await new web3.eth.Contract(recordsABI, medRecordsAddress);
-          const accountsManager = await new web3.eth.Contract(aManagerABI, accManagerAddress);
+          
+          const accounts  = await window.ethereum.request({
+            method: "eth_requestAccounts",
+          })
+          console.log(accounts);
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = provider.getSigner();
+          let records = await new ethers.Contract(medRecordsAddress, recordsABI, provider);
+          let accountsManager = await new ethers.Contract(accManagerAddress, aManagerABI, provider);
+          records = records.connect(signer);
+          accountsManager = accountsManager.connect(signer);
           context.setRecordsContract(records);
           context.setAccManagerContract(accountsManager);
           context.setAccount(accounts[0]);
-          web3.eth.getBalance(accounts[0]).then(console.log);
         } else {
           alert("install metamask extension!!");
         }
       };
 
-    const generateKeyPair =  ()  => {
-      rsa.generateKey(2048).then( (key) => {
+    const generateKeyPair =  async () => {
+      rsa.generateKey(2048).then( async (key) => {
         console.log("generujem novy keypair");
         localStorage.setItem("publicKey", JSON.stringify(key.publicKey));
         localStorage.setItem("privateKey", JSON.stringify(key.privateKey));
+        await registerDevice();
         checkIfRegistered();
       })
     }
 
+    const registerDevice = async() => {
+      let key = localStorage.getItem("publicKey");
+      console.log(key);
+      let result = await context.recordsContract
+                                  .registerDevice(key);
+      console.log(result);
+    };
     return(
       <Container>
         <Card className="text-center">
@@ -70,7 +84,7 @@ function Login() {
             <strong>Device registration status: {isDeviceRegistered.toString()}  </strong>
           </Card.Header>
           <Card.Body>
-          {isDeviceRegistered ? (
+          {!isDeviceRegistered ? (
                 <>{localStorage.getItem("publicKey")}</>
           ): (
             <Button onClick={generateKeyPair} variant="primary">

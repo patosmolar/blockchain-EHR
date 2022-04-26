@@ -20,8 +20,20 @@ contract MedicalRecords {
     }
 
     mapping(address => MedicalRecord) private records;
-    mapping(address => string) private publicKeys;
+    mapping(address => string) public publicKeys;
+    string test;
 
+    function getTest() public view returns(string memory){
+        return test;
+    }
+
+    function setTest() public {
+        test = "aaaa";
+    }
+
+    function getPublicKey(address addr) public view returns(string memory){
+        return publicKeys[addr];
+    }
     function registerDevice(string memory publicKey) public onlyMember(REGISTERED_USER_ROLE) {
         publicKeys[msg.sender] = publicKey;
     }
