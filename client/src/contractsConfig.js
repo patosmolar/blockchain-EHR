@@ -1,5 +1,5 @@
-export const accManagerAddress = "0xBe224F5a2d5ACA65Ae8F20DAb25b095c56463cBD";
-export const medRecordsAddress = "0xcA3922E372987e3E52305839075a7C5E3d1db14e";
+export const accManagerAddress = "0x1D7cE3d24d9ff9487a1198e3A7a7fEA1aEb4631D";
+export const medRecordsAddress = "0xbDffA4C7347A7F07da3924452bD8C20536A01843";
 
 export const recordsABI = [{
         "inputs": [{
@@ -101,17 +101,6 @@ export const recordsABI = [{
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "getTest",
-        "outputs": [{
-            "internalType": "string",
-            "name": "",
-            "type": "string"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [{
             "internalType": "address",
             "name": "",
@@ -128,18 +117,37 @@ export const recordsABI = [{
     },
     {
         "inputs": [{
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+        }],
+        "name": "records",
+        "outputs": [{
+                "internalType": "string",
+                "name": "mainFileHash",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "patientAccessFileHash",
+                "type": "string"
+            },
+            {
+                "internalType": "address",
+                "name": "mainFileCurrentOwner",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
             "internalType": "string",
             "name": "publicKey",
             "type": "string"
         }],
         "name": "registerDevice",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "setTest",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

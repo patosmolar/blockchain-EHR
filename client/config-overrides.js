@@ -11,7 +11,9 @@ module.exports = function override(config) {
         "os": require.resolve("os-browserify"),
         "url": require.resolve("url"),
         "ipfs-http-client": require.resolve("ipfs-http-client"),
-        "ethers": require.resolve("ethers")
+        "ethers": require.resolve("ethers"),
+        "ethers-utils": require.resolve("ethers-utils"),
+        "crypto-js": require.resolve("crypto-js")
     })
     config.resolve.fallback = fallback;
     config.plugins = (config.plugins || []).concat([

@@ -9,7 +9,7 @@ function SmartContractsProvider({ children }) {
     const [privateKey, setPrivateKey] = useState({});
     const [publicKey, setPublicKey] = useState({});
     const ipfsClient = create('https://ipfs.infura.io:5001/api/v0');
-    const [fileHash, SfileHash] = useState({});
+    const [recordFile, setRecordFile] = useState({});
 
 
     return (
@@ -21,8 +21,8 @@ function SmartContractsProvider({ children }) {
                                                 setPrivateKey:setPrivateKey,
                                                 publicKey:publicKey,
                                                 setPublicKey:setPublicKey,
-                                                fileHash:fileHash,
-                                                SfileHash:SfileHash,
+                                                recordFile:recordFile,
+                                                setRecordFile:setRecordFile,
                                                 account:account,
                                                 setAccount:setAccount,
                                                 ipfsClient:ipfsClient }}>

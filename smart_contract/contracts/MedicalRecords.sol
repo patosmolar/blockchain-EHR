@@ -19,17 +19,8 @@ contract MedicalRecords {
         address mainFileCurrentOwner;
     }
 
-    mapping(address => MedicalRecord) private records;
+    mapping(address => MedicalRecord) public records;
     mapping(address => string) public publicKeys;
-    string test;
-
-    function getTest() public view returns(string memory){
-        return test;
-    }
-
-    function setTest() public {
-        test = "aaaa";
-    }
 
     function getPublicKey(address addr) public view returns(string memory){
         return publicKeys[addr];

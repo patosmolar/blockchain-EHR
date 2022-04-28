@@ -1,6 +1,7 @@
 import React, { useState,useEffect, useRef  } from "react";
 import { Button, Form, Container, Col, Row } from "react-bootstrap";
 import SmartContractsContext from "../shared/SmartContractsContext";
+import EthersUtils from "ethers-utils";
 
 
 
@@ -11,9 +12,9 @@ function Register() {
 
     const onRegisterDoctor =  async (event) => {
         event.preventDefault();
-        console.log(doctorsAddressField.current.value);
+        console.log(EthersUtils.getAddress(doctorsAddressField.current.value));
         let result = await context.accManagerContract
-                                .registerDoctor(doctorsAddressField.current.value);
+                                .registerDoctor(EthersUtils.getAddress(doctorsAddressField.current.value));
         console.log(result);
     };
 
@@ -22,7 +23,7 @@ function Register() {
         event.preventDefault();
         console.log(patientsAddressField.current.value);
         let result = await context.accManagerContract
-                                .registerNewPatient(patientsAddressField.current.value);
+                                .registerNewPatient(EthersUtils.getAddress(patientsAddressField.current.value));
         console.log(result);
     };
 

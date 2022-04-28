@@ -4,7 +4,7 @@ import { Button, Card, Container } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {recordsABI, aManagerABI, accManagerAddress, medRecordsAddress} from "../contractsConfig.js";
 import SmartContractsContext from "../shared/SmartContractsContext";
-import rsa from 'js-crypto-rsa';
+
 
 function Login() {
     const context = React.useContext(SmartContractsContext);
@@ -49,13 +49,24 @@ function Login() {
       };
 
     const generateKeyPair =  async () => {
-      rsa.generateKey(2048).then( async (key) => {
-        console.log("generujem novy keypair");
-        localStorage.setItem("publicKey", JSON.stringify(key.publicKey));
-        localStorage.setItem("privateKey", JSON.stringify(key.privateKey));
-        await registerDevice();
-        checkIfRegistered();
-      })
+      let keyPair = await window.crypto.subtle.generateKey(
+        {
+          name: "RSA-OAEP",
+          modulusLength: 2048,
+          publicExponent: new Uint8Array([1, 0, 1]),
+          hash: "SHA-256"
+        },
+        true,
+        ["encrypt", "decrypt"]
+      );
+      console.log("generujem novy keypair");
+      let privKey = await window.crypto.subtle.exportKey("jwk", keyPair.privateKey);
+      let publicKey = await window.crypto.subtle.exportKey("jwk", keyPair.publicKey);
+      localStorage.setItem("publicKey", JSON.stringify(publicKey));
+      localStorage.setItem("privateKey", JSON.stringify(privKey));
+      console.log(keyPair.publicKey);
+      await registerDevice();
+      checkIfRegistered();
     }
 
     const registerDevice = async() => {
@@ -63,7 +74,6 @@ function Login() {
       console.log(key);
       let result = await context.recordsContract
                                   .registerDevice(key);
-      console.log(result);
     };
     return(
       <Container>
