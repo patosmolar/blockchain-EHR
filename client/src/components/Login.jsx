@@ -4,12 +4,19 @@ import { Button, Card, Container } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {recordsABI, aManagerABI, accManagerAddress, medRecordsAddress} from "../contractsConfig.js";
 import SmartContractsContext from "../shared/SmartContractsContext";
+import { useNavigate } from "react-router-dom";
+import EthersUtils from "ethers-utils";
 
+
+const DOCTOR_ROLE = "DOCTOR_ROLE";
+const PATIENT_ROLE = "PATIENT_ROLE";
+const ADMIN_ROLE = "ADMIN_ROLE";
 
 function Login() {
     const context = React.useContext(SmartContractsContext);
     const [isDeviceRegistered, setIsDeviceRegistered] = useState(false);
     const { ethereum } = window;
+    const navigate = useNavigate();
 
     const checkIfRegistered = () => {
       if(localStorage.getItem("publicKey") != undefined && 
@@ -33,16 +40,33 @@ function Login() {
           const accounts  = await window.ethereum.request({
             method: "eth_requestAccounts",
           })
-          console.log(accounts);
           const provider = new ethers.providers.Web3Provider(ethereum);
           const signer = provider.getSigner();
           let records = await new ethers.Contract(medRecordsAddress, recordsABI, provider);
           let accountsManager = await new ethers.Contract(accManagerAddress, aManagerABI, provider);
           records = records.connect(signer);
           accountsManager = accountsManager.connect(signer);
+
+          let isDoc = await accountsManager.isMemberOf(ethers.utils.formatBytes32String(DOCTOR_ROLE), EthersUtils.getAddress(accounts[0]));
+          if(isDoc === true){
+            context.setLogedUserType(DOCTOR_ROLE);
+          }else{
+            let isPatient = await accountsManager.isMemberOf(ethers.utils.formatBytes32String(PATIENT_ROLE), EthersUtils.getAddress(accounts[0]));
+            if(isPatient){
+              context.setLogedUserType(PATIENT_ROLE);
+            }else{
+              let isAdmin = await accountsManager.isAdmin();
+              if(isAdmin){
+                context.setLogedUserType(ADMIN_ROLE);
+              }else{
+                //TODO
+              }
+            }
+          }
           context.setRecordsContract(records);
           context.setAccManagerContract(accountsManager);
           context.setAccount(accounts[0]);
+          navigate("/home");
         } else {
           alert("install metamask extension!!");
         }
@@ -67,6 +91,7 @@ function Login() {
       console.log(keyPair.publicKey);
       await registerDevice();
       checkIfRegistered();
+      navigate("/home");
     }
 
     const registerDevice = async() => {
@@ -77,28 +102,28 @@ function Login() {
     };
     return(
       <Container>
-        <Card className="text-center">
+        <Card className="text-center mt-5">
           <Card.Header>
-            <strong>Address: </strong>
+            <strong>Adresa: </strong>
             {context.account.toString()}
           </Card.Header>
           <Card.Body>
             <Button onClick={connectButtonHandler} variant="primary">
-              Connect to wallet
+              Prihlásiť sa
             </Button>
           </Card.Body>     
         </Card>
 
-        <Card className="text-center">
+        <Card className="text-center mt-5">
           <Card.Header>
-            <strong>Device registration status: {isDeviceRegistered.toString()}  </strong>
+            <strong>Stav registrácie zariadenia</strong>
           </Card.Header>
           <Card.Body>
           {!isDeviceRegistered ? (
-                <>{localStorage.getItem("publicKey")}</>
+                <>Zaregistrované</>
           ): (
             <Button onClick={generateKeyPair} variant="primary">
-            Generate key-pair
+            Registrovať zariadenie
           </Button>
           )}
           </Card.Body>

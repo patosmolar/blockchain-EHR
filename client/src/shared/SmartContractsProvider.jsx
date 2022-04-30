@@ -2,6 +2,8 @@ import SmartContractsContext from "./SmartContractsContext";
 import { create } from "ipfs-http-client";
 import React, { createContext, useState } from "react";
 
+
+
 function SmartContractsProvider({ children }) {
     const [recordsContract, setRecordsContract] = useState();
     const [accManagerContract, setAccManagerContract] = useState();
@@ -10,6 +12,7 @@ function SmartContractsProvider({ children }) {
     const [publicKey, setPublicKey] = useState({});
     const ipfsClient = create('https://ipfs.infura.io:5001/api/v0');
     const [recordFile, setRecordFile] = useState({});
+    const [logedUserType, setLogedUserType]= useState("");
 
 
     return (
@@ -23,6 +26,8 @@ function SmartContractsProvider({ children }) {
                                                 setPublicKey:setPublicKey,
                                                 recordFile:recordFile,
                                                 setRecordFile:setRecordFile,
+                                                logedUserType:logedUserType,
+                                                setLogedUserType:setLogedUserType,
                                                 account:account,
                                                 setAccount:setAccount,
                                                 ipfsClient:ipfsClient }}>

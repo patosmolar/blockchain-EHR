@@ -4,9 +4,9 @@ pragma solidity ^0.8.4;
 import "./AccountsManager.sol";
 
 contract MedicalRecords {
-    bytes32 constant PATIEN_ROLE = sha256("PATIEN_ROLE");
-    bytes32 constant DOCTOR_ROLE = sha256("DOCTOR_ROLE");
-    bytes32 constant REGISTERED_USER_ROLE = sha256("REGISTERED_USER_ROLE");
+    bytes32 constant PATIEN_ROLE = "PATIEN_ROLE";
+    bytes32 constant DOCTOR_ROLE = "DOCTOR_ROLE";
+    bytes32 constant REGISTERED_USER_ROLE = "REGISTERED_USER_ROLE";
 
     AccountsManager accountsManager;
 

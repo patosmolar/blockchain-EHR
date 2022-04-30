@@ -1,5 +1,5 @@
-export const accManagerAddress = "0x1D7cE3d24d9ff9487a1198e3A7a7fEA1aEb4631D";
-export const medRecordsAddress = "0xbDffA4C7347A7F07da3924452bD8C20536A01843";
+export const accManagerAddress = "0x00e1643C55D78a5a02ac272B544f338de4476f06";
+export const medRecordsAddress = "0xEc0ccE19c34d2A1E1c9Fb97137D1099B939b35cF";
 
 export const recordsABI = [{
         "inputs": [{
@@ -287,6 +287,17 @@ export const aManagerABI = [{
             }
         ],
         "name": "hasRole",
+        "outputs": [{
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "isAdmin",
         "outputs": [{
             "internalType": "bool",
             "name": "",

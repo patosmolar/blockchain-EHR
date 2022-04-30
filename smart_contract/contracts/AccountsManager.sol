@@ -4,9 +4,9 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract AccountsManager is AccessControl {
-    bytes32 constant PATIEN_ROLE = sha256("PATIEN_ROLE");
-    bytes32 constant DOCTOR_ROLE = sha256("DOCTOR_ROLE");
-    bytes32 constant REGISTERED_USER_ROLE = sha256("REGISTERED_USER_ROLE");
+    bytes32 constant PATIEN_ROLE = "PATIEN_ROLE";
+    bytes32 constant DOCTOR_ROLE = "DOCTOR_ROLE";
+    bytes32 constant REGISTERED_USER_ROLE = "REGISTERED_USER_ROLE";
 
 
     /// @dev Add msg.sender as a member of the root role.
@@ -30,6 +30,10 @@ contract AccountsManager is AccessControl {
 
     function isPatientRegistered(address patientAddress) public view returns (bool){
             return hasRole(PATIEN_ROLE, patientAddress);
+    }
+
+    function isAdmin() public onlyMember(DEFAULT_ADMIN_ROLE) view returns(bool){
+        return true;
     }
 
     function isMemberOf(bytes32 roleId, address ad) public view returns(bool){

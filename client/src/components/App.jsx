@@ -7,13 +7,11 @@ import {
 
 import SmartContractsProvider from "../shared/SmartContractsProvider"
 import Home from "./Home";
-import AddRecordData from "./AddRecordData";
-import GetRecord from "./GetRecord";
 import Login from "./Login";
 import Navigation from "./Navigation";
 import Register from "./Register";
-import CreateNewRecord from "./CreateNewRecord";
 import ViewRecords from "./ViewRecords";
+import PrivateRoute from "./PrivateRoute";
 
 
 function App() {
@@ -22,14 +20,31 @@ function App() {
       <BrowserRouter>
         <Navigation/>
         <Routes>
-              <Route path ="/" element={<Home/>}/>
-              <Route path ="/home" element={<Home/>}/>
-              <Route path ="/login" element={<Login/>}/>
-              <Route path ="/addRecordData" element={<AddRecordData/>}/>
-              <Route path ="/getRecord" element={<GetRecord/>}/>
-              <Route path ="/register" element={<Register/>}/>
-              <Route path ="/createNewRecord" element={<CreateNewRecord/>}/>
-              <Route path ="/viewRecords" element={<ViewRecords/>}/>
+          <Route path ="/login" element={<Login/>}/>
+          <Route 
+            path ="/" 
+            element={
+              <PrivateRoute>
+                <Home/>
+              </PrivateRoute>}/>
+          <Route 
+            path ="/home" 
+            element={
+              <PrivateRoute>
+                <Home/>
+              </PrivateRoute>}/>
+          <Route 
+            path ="/register" 
+            element={
+              <PrivateRoute>
+                <Register/>
+              </PrivateRoute>}/>
+          <Route 
+            path ="/viewRecords/:isNew" 
+            element={
+              <PrivateRoute>
+                <ViewRecords/>
+              </PrivateRoute>}/>
         </Routes>
       </BrowserRouter>
     </SmartContractsProvider>
