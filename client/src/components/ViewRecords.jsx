@@ -5,16 +5,18 @@ import SmartContractsContext from "../shared/SmartContractsContext";
 import {RecordData} from "../shared/fileTemplate";
 import { useParams } from "react-router-dom";
 import EthersUtils from "ethers-utils";
-import crypto from 'crypto';
+
 
 function ViewRecords() {
     const context = React.useContext(SmartContractsContext);
+    const [mainFileOwner, setMainFileOwner] = useState(context.account);
     const {isNew} = useParams();
     const [disabled, setDisabled] = useState(isNew === "false");
     const [isCreatingRecord, setIsCreatingRecord] = useState(false);
     const [file, setFile] = useState({ ...context.recordFile});
     const [newRecordData, setNewRecordData] = useState({...new RecordData("DOCTORID","","")});
     let encoder = new TextEncoder();
+    var role = context.logedUserType;
 
     const changeEdit = () =>{
         setDisabled(disabled ? false:true);
@@ -63,7 +65,7 @@ function ViewRecords() {
     }
 
     const uploadFile = async ()  => {
-        const myPublic = context.publicKey;
+        const myPublic = await getPublicKeys(mainFileOwner);
         const patientsPublic = await getPublicKeys(file.address);
         let fileString = JSON.stringify(file);
         console.log(fileString);
@@ -77,7 +79,7 @@ function ViewRecords() {
         const result = await context.recordsContract.addMedicalRecord(EthersUtils.getAddress(file.address),
                                                                         myFileHash.path,
                                                                         patientsFileHash.path,
-                                                                        context.account);
+                                                                        mainFileOwner);
         console.log(result);
     };
 
@@ -167,7 +169,7 @@ function ViewRecords() {
         return buffer;
       };
     return (
-    <Container>
+    <Container id="viewForm" className="bg primary">
         <Form onSubmit={handleSubmit} className="justify-content-center m-auto mt-2">
             <Row className="mt-2">
                 <Col>
@@ -197,34 +199,43 @@ function ViewRecords() {
                     </Form.Group>
                 </Col>
             </Row> 
+            { role==="DOCTOR_ROLE"?  
+                <Row>
+                <Row className="mt-2">
+                    <Col>
+                        <Button
+                            onClick={changeEdit}
+                        >
+                            {disabled? "Povoliť editovanie":"Uložiť zmeny"}
+                        </Button>
+                    </Col>
+                    <Col>
+                    </Col>
+                    <Col>
+                        <Button
+                        type="submit"
+                        >
+                            Odoslať zmeny
+                        </Button>
+                    </Col>
+                    <Col>
+                        <Button
+                            onClick={addRecord}
+                        >
+                            {!isCreatingRecord? "Pridať záznam":"Uložiť nový záznam"}
+                        </Button>
+                    </Col>
+                </Row>
 
-            <Row className="mt-2">
-                <Col>
-                    <Button
-                        onClick={changeEdit}
-                    >
-                        {disabled? "Povoliť editovanie":"Uložiť zmeny"}
-                    </Button>
-                </Col>
-                <Col>
-                </Col>
-                <Col>
-                    <Button
-                    type="submit"
-                    >
-                        Odoslať zmeny
-                    </Button>
-                </Col>
 
-                <Col>
-                    <Button
-                        onClick={addRecord}
-                    >
-                        {!isCreatingRecord? "Pridať záznam":"Uložiť nový záznam"}
-                    </Button>
-                </Col>
-            </Row>
-            
+                <Form.Group className="xs-3">
+                        <Form.Label>Adresa vlastníka hlavného súboru</Form.Label>
+                        <Form.Control disabled={disabled} value={mainFileOwner} onChange={(e) => setMainFileOwner(e.target.value)} name="mainFileOwner" type="text"/>
+                </Form.Group>   
+
+                </Row>
+            :<></>              
+            }
             <Row className="mt-5">
                 {!isCreatingRecord? 
                 <Carousel interval={null} wrap={false}>

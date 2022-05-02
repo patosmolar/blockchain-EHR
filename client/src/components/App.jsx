@@ -1,3 +1,7 @@
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import 'bootstrap-css-only/css/bootstrap.min.css';
+import 'mdbreact/dist/css/mdb.css';
+
 import ReactDOM from "react-dom";
 import {
     Routes,
@@ -47,6 +51,7 @@ function App() {
               </PrivateRoute>}/>
         </Routes>
       </BrowserRouter>
+      <div className='d-none'>Designed by Hello-Pixel http://www.freepik.com </div>
     </SmartContractsProvider>
   );
 }

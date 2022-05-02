@@ -1,5 +1,5 @@
-export const accManagerAddress = "0x00e1643C55D78a5a02ac272B544f338de4476f06";
-export const medRecordsAddress = "0xEc0ccE19c34d2A1E1c9Fb97137D1099B939b35cF";
+export const accManagerAddress = "0xD0f71a500E58444b8f267ED4BD19B057e3E27915";
+export const medRecordsAddress = "0xca83F1a272787F55F0b96543329B51Cb578C8E8C";
 
 export const recordsABI = [{
         "inputs": [{

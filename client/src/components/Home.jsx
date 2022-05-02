@@ -10,14 +10,28 @@ function Home() {
   const context = React.useContext(SmartContractsContext);
   const [isLoading, setLoading] = useState(false);
   const navigate = useNavigate();
-  console.log(context.logedUserType);
-
+  var role = context.logedUserType;
   const createNewRecord = (event) =>{
     event.preventDefault();
     var file = new RecordFile(event.target.patientAddress.value);
     context.setRecordFile(file);
     navigate("/viewRecords/true");
   }
+
+  const loadMyData = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+    var fileRaw = await getRawFileFromAddressPatient();
+    var keyIVData = await extractKeyIVData(fileRaw);
+    var file = await aesDecrypt(keyIVData.data, keyIVData.key, keyIVData.IV);
+    var rawFileString = ab2str(file);
+    var ch = rawFileString[rawFileString.length-1];
+    var parsable = rawFileString.replaceAll(ch, "");
+    console.log(parsable);
+    context.setRecordFile(JSON.parse(parsable));
+    setLoading(false);
+    navigate("/viewRecords/false");
+  };
 
   const loadPatientData = async (event) =>
   {
@@ -33,6 +47,15 @@ function Home() {
     context.setRecordFile(JSON.parse(parsable));
     setLoading(false);
     navigate("/viewRecords/false");
+  };
+
+  const getRawFileFromAddressPatient = async () =>{
+    let path = await context.recordsContract.getMediacalRecordPatient();
+    const chunks = []
+    for await (const chunk of context.ipfsClient.cat(path)) {
+      chunks.push(chunk)
+    }
+    return Buffer.concat(chunks);
   };
 
   const getRawFileFromAddress = async (addr) =>{
@@ -113,9 +136,9 @@ function Home() {
                         .decrypt(algoEncrypt, key, message);
 };
 
-
+if(role ==="DOCTOR_ROLE"){
   return(
-    <Container>
+    <Container className="mt-3">
         <Row className="mt-4">
             <Col>
                 <Card className="text-center">
@@ -130,7 +153,7 @@ function Home() {
                             </Form.Group>
                             <Form.Group className="mt-2" >
                                 <Button
-                                variant="primary"
+                                variant="info"
                                 type="submit"
                                 disabled={isLoading}
                                 >
@@ -142,7 +165,7 @@ function Home() {
                 </Card>
             </Col>
             <Col>
-            <Card className="text-center">
+            <Card className="text-center blue lighten-5">
                     <Card.Header>
                         Vytvoriť záznam pre nového pacienta {"0x2C9353499784c1D3BBA16648903BAa030d3452f1"}
                     </Card.Header>
@@ -154,7 +177,7 @@ function Home() {
                             </Form.Group>
                             <Form.Group className="mt-2" >
                                 <Button
-                                variant="primary"
+                                variant="info"
                                 type="submit"
                                 disabled={isLoading}
                                 >
@@ -163,16 +186,38 @@ function Home() {
                             </Form.Group>
                         </Form>
                     </Card.Body>
-                </Card>
-            
+              </Card>
             </Col>
-
         </Row>
-        
-
     </Container>
-    
+  );
+}else if(role ==="PATIENT_ROLE"){
+  return(
+    <Container>
+        <Card className="mt-5 w-50 m-auto justify-content-center text-center">
+                    <Card.Header>
+                       Načítať záznam
+                    </Card.Header>
+                    <Card.Body>
+                        <Form onSubmit={loadMyData}>
+                            <Form.Group className="mt-2" >
+                                <Button
+                                variant="info"
+                                type="submit"
+                                disabled={isLoading}
+                                >
+                                {isLoading ? 'Načítavam...' : 'Načítať'}
+                                </Button>
+                            </Form.Group>
+                        </Form>
+                    </Card.Body>
+              </Card>
+    </Container>
+  )
+}else{
+  return(
+    <h2>Vitaj : {context.account}</h2>
   );
 }
-
+}
 export default Home;

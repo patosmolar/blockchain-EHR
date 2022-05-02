@@ -5,7 +5,7 @@ import SmartContractsContext from "../shared/SmartContractsContext";
 
 function PrivateRoute({ children }) {
     const context = React.useContext(SmartContractsContext);
-    const auth = context.account !== "" &&  context.privateKey !== undefined;
+    const auth = context.logedUserType !== "NAN";
     if (!auth) {
         // not logged in so redirect to login page with the return url
         return <Navigate to="/login" />

@@ -12,7 +12,7 @@ function SmartContractsProvider({ children }) {
     const [publicKey, setPublicKey] = useState({});
     const ipfsClient = create('https://ipfs.infura.io:5001/api/v0');
     const [recordFile, setRecordFile] = useState({});
-    const [logedUserType, setLogedUserType]= useState("");
+    const [logedUserType, setLogedUserType]= useState("NAN");
 
 
     return (

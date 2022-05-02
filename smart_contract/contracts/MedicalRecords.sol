@@ -17,41 +17,67 @@ contract MedicalRecords {
         string mainFileHash;
         string patientAccessFileHash;
         address mainFileCurrentOwner;
+        bool isEditable;
+        bool isValue;
     }
 
-    mapping(address => MedicalRecord) public records;
-    mapping(address => string) public publicKeys;
+    mapping(address => MedicalRecord) private records;
+    mapping(address => string) private publicKeys;
 
     function getPublicKey(address addr) public view returns(string memory){
         return publicKeys[addr];
     }
-    function registerDevice(string memory publicKey) public onlyMember(REGISTERED_USER_ROLE) {
+
+    function registerDevice(string memory publicKey, bool force) public onlyMember(REGISTERED_USER_ROLE){
+        bytes memory data = bytes(publicKeys[msg.sender]);
+        require(data.length == 0 || force,"User alredy have device registered and force is set to false");
         publicKeys[msg.sender] = publicKey;
     }
 
-    function addMedicalRecord(address patientAddress, 
+    function addMedicalFolder(address patientAddress, 
                               string memory mainFileHash,
                               string memory patientAccessFileHash,
-                              address mainFileHashOwner) public onlyMember(DOCTOR_ROLE) {
-        records[patientAddress] = MedicalRecord(mainFileHash, patientAccessFileHash, mainFileHashOwner);
+                              address mainFileHashOwner) public onlyMember(DOCTOR_ROLE){
+        require(records[patientAddress].isValue == false, "User alredy posses medical folder");
+        records[patientAddress] = MedicalRecord(mainFileHash, patientAccessFileHash, mainFileHashOwner, true, true);
+    }
+
+    // function to easiely get doctors fileHash, 
+    //be aware that all data is accesible publicly, this is not protection at any level
+    function getMediacalRecordDoctor(address patientAddress) public view returns(string memory){
+        require(records[patientAddress].mainFileCurrentOwner == msg.sender, "Unauthorized");
+        return records[patientAddress].mainFileHash;
     }
     
+    // function to easiely get patients fileHash, 
+    //be aware that all data is accesible publicly, this is not protection at any level
     function getMediacalRecordPatient() public view returns(string memory){
         return records[msg.sender].patientAccessFileHash;
     }
 
-    function getMediacalRecordDoctor(address patientAddress) public view returns(string memory){
-        if(records[patientAddress].mainFileCurrentOwner != msg.sender){
-            return "Unauthorized";
-        }
-        return records[patientAddress].mainFileHash;
+    function updateMedicalRecord(address patientAddress, 
+                              string memory mainFileHash,
+                              string memory patientAccessFileHash,
+                              address mainFileOwner) public onlyMember(DOCTOR_ROLE) {
+        require(records[patientAddress].mainFileCurrentOwner == msg.sender, "Not mainFile owner");
+        require(records[patientAddress].isEditable == true, "Folder not editable");
+        records[patientAddress].mainFileHash = mainFileHash;
+        records[patientAddress].patientAccessFileHash = patientAccessFileHash;
+        records[patientAddress].mainFileCurrentOwner = mainFileOwner;
     }
 
-    function changeMainFileOwnership(address patientPublicAddress, 
-                                     address newOwner,
-                                     string memory newFileHash) public onlyMainFileOwner(patientPublicAddress){
-        records[patientPublicAddress].mainFileHash = newFileHash;
-        records[patientPublicAddress].mainFileCurrentOwner = newOwner;
+    function deleteMedicalFolder(address patientAddress) public onlyMember(DOCTOR_ROLE) {
+        require(records[patientAddress].mainFileCurrentOwner == msg.sender, "Not mainFile owner");
+        require(records[patientAddress].isEditable == true, "Folder not editable");
+        delete records[patientAddress];
+    }   
+
+    function denyFolderEdit() public onlyMember(REGISTERED_USER_ROLE){
+        records[msg.sender].isEditable = false;
+    }
+
+    function allowFolderEdit() public onlyMember(REGISTERED_USER_ROLE){
+        records[msg.sender].isEditable = true;
     }
 
 

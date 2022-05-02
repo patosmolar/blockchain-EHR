@@ -1,3 +1,45 @@
+@import "bootstrap";
+html,
+body,
+#app,
+#app>div {
+    height: 100%;
+}
+
+#root {
+    height: 100%;
+    background-image: url("../../public/bg.jpg");
+}
+
+#viewForm {
+    background-image: linear-gradient(to bottom right, #f4faff, #f4faff);
+    border-radius: 25px;
+}
+
+.carousel-control-next-icon,
+.carousel-control-prev-icon {
+    color: red;
+}
+
+.card-body {
+    background-image: linear-gradient(to bottom right, white, white);
+}
+
+.card {
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+}
+
+.card-header {
+    background-image: linear-gradient(to bottom right, #75c3f0, #75c3f0);
+}
+
+.navbar {
+    background-color: #ffffff;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+}
+
 .App {
     text-align: center;
 }
