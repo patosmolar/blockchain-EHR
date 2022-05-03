@@ -13,6 +13,7 @@ contract MedicalRecords {
     constructor (address accoutnsManagerContractAddress) {
         accountsManager = AccountsManager(accoutnsManagerContractAddress);
     }
+
     struct MedicalRecord{
         string mainFileHash;
         string patientAccessFileHash;
@@ -21,18 +22,34 @@ contract MedicalRecords {
         bool isValue;
     }
 
+    struct Registration{
+        string publicKey;
+        string privateKey;
+        bool isValue;
+    }
+
     mapping(address => MedicalRecord) private records;
-    mapping(address => string) private publicKeys;
+    mapping(address => Registration) private credentials;
 
     function getPublicKey(address addr) public view returns(string memory){
-        return publicKeys[addr];
+        return credentials[addr].publicKey;
     }
 
-    function registerDevice(string memory publicKey, bool force) public onlyMember(REGISTERED_USER_ROLE){
-        bytes memory data = bytes(publicKeys[msg.sender]);
-        require(data.length == 0 || force,"User alredy have device registered and force is set to false");
-        publicKeys[msg.sender] = publicKey;
+    function getPrivateKey() public view returns(string memory){
+        return publicKeys[msg.sender];
     }
+
+    function isAccountRegistered(address addr) public view returns(bool){
+        return credentials[addr].isValue;
+    }
+
+    function registerCredentials(string memory publicKey, string memory privateKey) public onlyMember(REGISTERED_USER_ROLE){
+        credentials[msg.sender] = Registration(publicKey, privateKey, true);
+    }
+
+    function medicalFolderExists(address patientAddress) public onlyMember(REGISTERED_USER_ROLE) view returns(bool){
+        return records[patientAddress].isValue;
+    } 
 
     function addMedicalFolder(address patientAddress, 
                               string memory mainFileHash,
@@ -44,7 +61,7 @@ contract MedicalRecords {
 
     // function to easiely get doctors fileHash, 
     //be aware that all data is accesible publicly, this is not protection at any level
-    function getMediacalRecordDoctor(address patientAddress) public view returns(string memory){
+    function getMediacalRecordDoctor(address patientAddress) public onlyMember(DOCTOR_ROLE) view returns(string memory){
         require(records[patientAddress].mainFileCurrentOwner == msg.sender, "Unauthorized");
         return records[patientAddress].mainFileHash;
     }
@@ -71,6 +88,10 @@ contract MedicalRecords {
         require(records[patientAddress].isEditable == true, "Folder not editable");
         delete records[patientAddress];
     }   
+
+    function getFolderEditState(address patientAddress) public onlyMember(REGISTERED_USER_ROLE) view returns(bool){
+        return records[patientAddress].isEditable;
+    }
 
     function denyFolderEdit() public onlyMember(REGISTERED_USER_ROLE){
         records[msg.sender].isEditable = false;
