@@ -1,5 +1,5 @@
-export const accManagerAddress = "0xA4Ab63b1201B6e205025C16aA7812df4827a9353";
-export const medRecordsAddress = "0x6E7C963D7228D8f55f33d00CB8B4478Eab45ed9A";
+export const accManagerAddress = "0x53E539Ef16BDda446987C46C940F9CB6935b41DF";
+export const medRecordsAddress = "0x2E2A697B9120bD3160d7A481Bbf4C51192C19E91";
 
 export const recordsABI = [{
         "inputs": [{
@@ -106,21 +106,6 @@ export const recordsABI = [{
     {
         "inputs": [{
             "internalType": "address",
-            "name": "addr",
-            "type": "address"
-        }],
-        "name": "getPublicKey",
-        "outputs": [{
-            "internalType": "string",
-            "name": "",
-            "type": "string"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-            "internalType": "address",
             "name": "patientAddress",
             "type": "address"
         }],
@@ -131,23 +116,6 @@ export const recordsABI = [{
             "type": "bool"
         }],
         "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-                "internalType": "string",
-                "name": "publicKey",
-                "type": "string"
-            },
-            {
-                "internalType": "bool",
-                "name": "force",
-                "type": "bool"
-            }
-        ],
-        "name": "registerDevice",
-        "outputs": [],
-        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -268,6 +236,32 @@ export const aManagerABI = [{
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "getPrivateKey",
+        "outputs": [{
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "address",
+            "name": "addr",
+            "type": "address"
+        }],
+        "name": "getPublicKey",
+        "outputs": [{
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [{
             "internalType": "bytes32",
             "name": "role",
@@ -312,6 +306,21 @@ export const aManagerABI = [{
             }
         ],
         "name": "hasRole",
+        "outputs": [{
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "address",
+            "name": "addr",
+            "type": "address"
+        }],
+        "name": "isAccountRegistered",
         "outputs": [{
             "internalType": "bool",
             "name": "",
@@ -384,10 +393,21 @@ export const aManagerABI = [{
     },
     {
         "inputs": [{
-            "internalType": "address",
-            "name": "doctorAddress",
-            "type": "address"
-        }],
+                "internalType": "address",
+                "name": "doctorAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "string",
+                "name": "publicKey",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "privateKey",
+                "type": "string"
+            }
+        ],
         "name": "registerDoctor",
         "outputs": [],
         "stateMutability": "nonpayable",
@@ -395,10 +415,21 @@ export const aManagerABI = [{
     },
     {
         "inputs": [{
-            "internalType": "address",
-            "name": "patientAddress",
-            "type": "address"
-        }],
+                "internalType": "address",
+                "name": "patientAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "string",
+                "name": "publicKey",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "privateKey",
+                "type": "string"
+            }
+        ],
         "name": "registerNewPatient",
         "outputs": [],
         "stateMutability": "nonpayable",

@@ -12,6 +12,7 @@ contract MedicalRecords {
 
     constructor (address accoutnsManagerContractAddress) {
         accountsManager = AccountsManager(accoutnsManagerContractAddress);
+        
     }
 
     struct MedicalRecord{
@@ -22,30 +23,9 @@ contract MedicalRecords {
         bool isValue;
     }
 
-    struct Registration{
-        string publicKey;
-        string privateKey;
-        bool isValue;
-    }
-
     mapping(address => MedicalRecord) private records;
-    mapping(address => Registration) private credentials;
 
-    function getPublicKey(address addr) public view returns(string memory){
-        return credentials[addr].publicKey;
-    }
-
-    function getPrivateKey() public view returns(string memory){
-        return publicKeys[msg.sender];
-    }
-
-    function isAccountRegistered(address addr) public view returns(bool){
-        return credentials[addr].isValue;
-    }
-
-    function registerCredentials(string memory publicKey, string memory privateKey) public onlyMember(REGISTERED_USER_ROLE){
-        credentials[msg.sender] = Registration(publicKey, privateKey, true);
-    }
+    
 
     function medicalFolderExists(address patientAddress) public onlyMember(REGISTERED_USER_ROLE) view returns(bool){
         return records[patientAddress].isValue;

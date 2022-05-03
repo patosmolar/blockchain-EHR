@@ -7,9 +7,11 @@ body,
 }
 
 #root {
-    height: 100%;
     background-image: url("../../public/bg.jpg");
     background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    min-height: 100%;
 }
 
 #viewForm {
@@ -17,9 +19,35 @@ body,
     border-radius: 5px;
 }
 
+.nav-link {
+    border-radius: 10px;
+}
+
+.nav-link.active {
+    background-color: #83c5be;
+    border-radius: 10px;
+}
+
 .carousel-control-next-icon,
 .carousel-control-prev-icon {
     color: red;
+}
+
+.btn-info {
+    outline: none !important;
+    border-color: transparent !important;
+    background-image: linear-gradient(to bottom right, #83c5be, #83c5be);
+}
+
+.btn-primary {
+    outline: none !important;
+    border-color: transparent !important;
+    background-image: linear-gradient(to bottom right, #83c5be, #83c5be);
+}
+
+.btn:focus {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 .card-body {
@@ -27,12 +55,14 @@ body,
 }
 
 .card {
+    outline: none !important;
+    border-color: #83c5be !important;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
 }
 
 .card-header {
-    background-image: linear-gradient(to bottom right, #75c3f0, #75c3f0);
+    background-image: linear-gradient(to bottom right, #83c5be, #83c5be);
 }
 
 .navbar {

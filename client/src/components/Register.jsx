@@ -1,31 +1,38 @@
-import React, { useState,useEffect, useRef  } from "react";
+import React, { useRef  } from "react";
 import { Button, Form, Container, Col, Row, Card } from "react-bootstrap";
 import SmartContractsContext from "../shared/SmartContractsContext";
 import EthersUtils from "ethers-utils";
-
+import {generateKeyPairRSA,wrapRsaPrivate, arrayBufferToString} from "../shared/Utils";
 
 
 function Register() {
     const context = React.useContext(SmartContractsContext);
     var role = context.logedUserType;
     let patientsAddressField = useRef(null);
+    let patientsPassword = useRef(null);
+    let doctorsPassword = useRef(null);
     let doctorsAddressField = useRef(null);
 
     const onRegisterDoctor =  async (event) => {
         event.preventDefault();
-        console.log(EthersUtils.getAddress(doctorsAddressField.current.value));
-        let result = await context.accManagerContract
-                                .registerDoctor(EthersUtils.getAddress(doctorsAddressField.current.value));
-        console.log(result);
+        var keyPair = await generateKeyPairRSA();
+        var wrappedPrivate = await wrapRsaPrivate(keyPair.privateKey, doctorsPassword.current.value);
+        var stringedPrivate = arrayBufferToString(wrappedPrivate);
+        var stringedPublic = JSON.stringify(await window.crypto.subtle.exportKey("jwk", keyPair.publicKey));
+        await context.accManagerContract
+                                .registerDoctor(EthersUtils.getAddress(doctorsAddressField.current.value),
+                                stringedPublic, stringedPrivate);
     };
-
 
     const onRegisterPatient = async (event) => {
         event.preventDefault();
-        console.log(patientsAddressField.current.value);
-        let result = await context.accManagerContract
-                                .registerNewPatient(EthersUtils.getAddress(patientsAddressField.current.value));
-        console.log(result);
+        var keyPair = await generateKeyPairRSA();
+        var wrappedPrivate = await wrapRsaPrivate(keyPair.privateKey, patientsPassword.current.value);
+        var stringedPrivate = arrayBufferToString(wrappedPrivate);
+        var stringedPublic = JSON.stringify(await window.crypto.subtle.exportKey("jwk", keyPair.publicKey));
+        await context.accManagerContract
+                                .registerNewPatient(EthersUtils.getAddress(patientsAddressField.current.value),
+                                stringedPublic, stringedPrivate);
     };
 
     if(role === "ADMIN_ROLE"){
@@ -46,7 +53,15 @@ function Register() {
                                     
                                     </Form.Text>
                                 </Form.Group>
-            
+
+                                <Form.Group className="mb-3" controlId="password">
+                                    <Form.Label>Heslo</Form.Label>
+                                    <Form.Control ref={patientsPassword} type="password" />
+                                    <Form.Text className="text-muted">
+                                    
+                                    </Form.Text>
+                                </Form.Group>
+                                
                                 <Button variant="info" type="submit">
                                     Zaregistrovať
                                 </Button>
@@ -62,13 +77,21 @@ function Register() {
                         </Card.Header>
                         <Card.Body>
                             <Form onSubmit={onRegisterDoctor}>
-                                <Form.Group  className="mb-3" controlId="formBasicEmail">
+                                <Form.Group  className="mb-3" controlId="formBasicEmail2">
                                     <Form.Label>Adresa doktora</Form.Label>
                                     <Form.Control ref={doctorsAddressField} type="text" placeholder="0x16a..."/>
                                     <Form.Text className="text-muted">
                                     </Form.Text>
                                 </Form.Group>
-            
+
+                                <Form.Group className="mb-3" controlId="password2">
+                                    <Form.Label>Heslo</Form.Label>
+                                    <Form.Control ref={doctorsPassword} type="password" />
+                                    <Form.Text className="text-muted">
+                                    
+                                    </Form.Text>
+                                </Form.Group>
+
                                 <Button variant="info" type="submit">
                                     ZAREGISTROVAŤ
                                 </Button>
@@ -101,7 +124,15 @@ function Register() {
                                     
                                     </Form.Text>
                                 </Form.Group>
-            
+
+                                <Form.Group className="mb-3" controlId="password">
+                                    <Form.Label>Heslo</Form.Label>
+                                    <Form.Control ref={patientsPassword} type="password" />
+                                    <Form.Text className="text-muted">
+                                    
+                                    </Form.Text>
+                                </Form.Group>
+
                                 <Button variant="primary" type="submit">
                                     Zaregistrovať
                                 </Button>

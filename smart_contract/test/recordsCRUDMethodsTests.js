@@ -7,15 +7,12 @@ describe("MedicalRecords", function() {
         const AccountsManager = await ethers.getContractFactory("AccountsManager");
         const manager = await AccountsManager.deploy();
         await manager.deployed();
-        await manager.registerDoctor(addr1.address);
-        await manager.connect(addr1).registerNewPatient(addr2.address);
+        await manager.registerDoctor(addr1.address, "a", "a");
+        await manager.connect(addr1).registerNewPatient(addr2.address, "a", "a");
 
         const Records = await ethers.getContractFactory("MedicalRecords");
         const records = await Records.deploy(manager.address);
         await records.deployed();
-
-        await records.connect(addr1).registerDevice("test", false);
-        await records.connect(addr2).registerDevice("test", false);
 
         await records.connect(addr1).addMedicalFolder(addr2.address,
             "mainFileHash",
@@ -30,15 +27,12 @@ describe("MedicalRecords", function() {
         const AccountsManager = await ethers.getContractFactory("AccountsManager");
         const manager = await AccountsManager.deploy();
         await manager.deployed();
-        await manager.registerDoctor(addr1.address);
-        await manager.connect(addr1).registerNewPatient(addr2.address);
+        await manager.registerDoctor(addr1.address, "a", "a");
+        await manager.connect(addr1).registerNewPatient(addr2.address, "a", "a");
 
         const Records = await ethers.getContractFactory("MedicalRecords");
         const records = await Records.deploy(manager.address);
         await records.deployed();
-
-        await records.connect(addr1).registerDevice("test", false);
-        await records.connect(addr2).registerDevice("test", false);
 
         await records.connect(addr1).addMedicalFolder(addr2.address,
             "mainFileHash",
@@ -59,15 +53,12 @@ describe("MedicalRecords", function() {
         const AccountsManager = await ethers.getContractFactory("AccountsManager");
         const manager = await AccountsManager.deploy();
         await manager.deployed();
-        await manager.registerDoctor(addr1.address);
-        await manager.connect(addr1).registerNewPatient(addr2.address);
+        await manager.registerDoctor(addr1.address, "a", "a");
+        await manager.connect(addr1).registerNewPatient(addr2.address, "a", "a");
 
         const Records = await ethers.getContractFactory("MedicalRecords");
         const records = await Records.deploy(manager.address);
         await records.deployed();
-
-        await records.connect(addr1).registerDevice("test", false);
-        await records.connect(addr2).registerDevice("test", false);
 
         await records.connect(addr1).addMedicalFolder(addr2.address,
             "mainFileHash",
@@ -82,16 +73,12 @@ describe("MedicalRecords", function() {
         const AccountsManager = await ethers.getContractFactory("AccountsManager");
         const manager = await AccountsManager.deploy();
         await manager.deployed();
-        await manager.registerDoctor(addr1.address);
-        await manager.connect(addr1).registerNewPatient(addr2.address);
+        await manager.registerDoctor(addr1.address, "a", "a");
+        await manager.connect(addr1).registerNewPatient(addr2.address, "a", "a");
 
         const Records = await ethers.getContractFactory("MedicalRecords");
         const records = await Records.deploy(manager.address);
         await records.deployed();
-
-        await records.connect(owner).registerDevice("test", false);
-        await records.connect(addr1).registerDevice("test", false);
-        await records.connect(addr2).registerDevice("test", false);
 
         await records.connect(owner).addMedicalFolder(addr2.address,
             "mainFileHash",
@@ -105,16 +92,12 @@ describe("MedicalRecords", function() {
         const AccountsManager = await ethers.getContractFactory("AccountsManager");
         const manager = await AccountsManager.deploy();
         await manager.deployed();
-        await manager.registerDoctor(addr1.address);
-        await manager.connect(addr1).registerNewPatient(addr2.address);
+        await manager.registerDoctor(addr1.address, "a", "a");
+        await manager.connect(addr1).registerNewPatient(addr2.address, "a", "a");
 
         const Records = await ethers.getContractFactory("MedicalRecords");
         const records = await Records.deploy(manager.address);
         await records.deployed();
-
-        await records.connect(owner).registerDevice("test", false);
-        await records.connect(addr1).registerDevice("test", false);
-        await records.connect(addr2).registerDevice("test", false);
 
         await records.connect(owner).addMedicalFolder(addr2.address,
             "mainFileHash",
@@ -128,16 +111,12 @@ describe("MedicalRecords", function() {
         const AccountsManager = await ethers.getContractFactory("AccountsManager");
         const manager = await AccountsManager.deploy();
         await manager.deployed();
-        await manager.registerDoctor(addr1.address);
-        await manager.connect(addr1).registerNewPatient(addr2.address);
+        await manager.registerDoctor(addr1.address, "a", "a");
+        await manager.connect(addr1).registerNewPatient(addr2.address, "a", "a");
 
         const Records = await ethers.getContractFactory("MedicalRecords");
         const records = await Records.deploy(manager.address);
         await records.deployed();
-
-        await records.connect(owner).registerDevice("test", false);
-        await records.connect(addr1).registerDevice("test", false);
-        await records.connect(addr2).registerDevice("test", false);
 
         await records.connect(owner).addMedicalFolder(addr2.address,
             "mainFileHash",
@@ -153,16 +132,12 @@ describe("MedicalRecords", function() {
         const AccountsManager = await ethers.getContractFactory("AccountsManager");
         const manager = await AccountsManager.deploy();
         await manager.deployed();
-        await manager.registerDoctor(addr1.address);
-        await manager.connect(addr1).registerNewPatient(addr2.address);
+        await manager.registerDoctor(addr1.address, "a", "a");
+        await manager.connect(addr1).registerNewPatient(addr2.address, "a", "a");
 
         const Records = await ethers.getContractFactory("MedicalRecords");
         const records = await Records.deploy(manager.address);
         await records.deployed();
-
-        await records.connect(owner).registerDevice("test", false);
-        await records.connect(addr1).registerDevice("test", false);
-        await records.connect(addr2).registerDevice("test", false);
 
         await records.connect(owner).addMedicalFolder(addr2.address,
             "mainFileHash",
@@ -184,16 +159,12 @@ describe("MedicalRecords", function() {
         const AccountsManager = await ethers.getContractFactory("AccountsManager");
         const manager = await AccountsManager.deploy();
         await manager.deployed();
-        await manager.registerDoctor(addr1.address);
-        await manager.connect(addr1).registerNewPatient(addr2.address);
+        await manager.registerDoctor(addr1.address, "a", "a");
+        await manager.connect(addr1).registerNewPatient(addr2.address, "a", "a");
 
         const Records = await ethers.getContractFactory("MedicalRecords");
         const records = await Records.deploy(manager.address);
         await records.deployed();
-
-        await records.connect(owner).registerDevice("test", false);
-        await records.connect(addr1).registerDevice("test", false);
-        await records.connect(addr2).registerDevice("test", false);
 
         await records.connect(owner).addMedicalFolder(addr2.address,
             "mainFileHash",
@@ -209,16 +180,12 @@ describe("MedicalRecords", function() {
         const AccountsManager = await ethers.getContractFactory("AccountsManager");
         const manager = await AccountsManager.deploy();
         await manager.deployed();
-        await manager.registerDoctor(addr1.address);
-        await manager.connect(addr1).registerNewPatient(addr2.address);
+        await manager.registerDoctor(addr1.address, "a", "a");
+        await manager.connect(addr1).registerNewPatient(addr2.address, "a", "a");
 
         const Records = await ethers.getContractFactory("MedicalRecords");
         const records = await Records.deploy(manager.address);
         await records.deployed();
-
-        await records.connect(owner).registerDevice("test", false);
-        await records.connect(addr1).registerDevice("test", false);
-        await records.connect(addr2).registerDevice("test", false);
 
         await records.connect(owner).addMedicalFolder(addr2.address,
             "mainFileHash",
@@ -232,16 +199,12 @@ describe("MedicalRecords", function() {
         const AccountsManager = await ethers.getContractFactory("AccountsManager");
         const manager = await AccountsManager.deploy();
         await manager.deployed();
-        await manager.registerDoctor(addr1.address);
-        await manager.connect(addr1).registerNewPatient(addr2.address);
+        await manager.registerDoctor(addr1.address, "a", "a");
+        await manager.connect(addr1).registerNewPatient(addr2.address, "a", "a");
 
         const Records = await ethers.getContractFactory("MedicalRecords");
         const records = await Records.deploy(manager.address);
         await records.deployed();
-
-        await records.connect(owner).registerDevice("test", false);
-        await records.connect(addr1).registerDevice("test", false);
-        await records.connect(addr2).registerDevice("test", false);
 
         await records.connect(owner).addMedicalFolder(addr2.address,
             "mainFileHash",

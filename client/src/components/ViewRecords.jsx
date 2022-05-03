@@ -5,7 +5,7 @@ import SmartContractsContext from "../shared/SmartContractsContext";
 import {RecordData} from "../shared/fileTemplate";
 import { useParams,useNavigate } from "react-router-dom";
 import EthersUtils from "ethers-utils";
-
+import { generateAESKeyIV, aesEncrypt, importRSAKeyPublic, exportAESKeyString , rsaEncrypt  } from "../shared/Utils"
 
 function ViewRecords() {
     const context = React.useContext(SmartContractsContext);
@@ -13,10 +13,9 @@ function ViewRecords() {
     const {isNew} = useParams();
     const [disabled, setDisabled] = useState(isNew === "false");
     const [isCreatingRecord, setIsCreatingRecord] = useState(false);
-    const [isFolderEditable, setIsFileEditable] = useState(false);
+    const [isFolderEditable, setIsFileEditable] = useState(isNew === "true");
     const [file, setFile] = useState({ ...context.recordFile});
     const [newRecordData, setNewRecordData] = useState({...new RecordData("DOCTORID","","")});
-    let encoder = new TextEncoder();
     var role = context.logedUserType;
     const navigate = useNavigate();
 
@@ -25,48 +24,12 @@ function ViewRecords() {
         async function getEditableStatus() {
             const isEditable = await context.recordsContract.getFolderEditState(EthersUtils.getAddress(file.address));
             setIsFileEditable(isEditable);
-            console.log(isEditable);
         }
         if(isNew === "false"){
             getEditableStatus();
         }
      }, [])
 
-
-    const changeFolderEditOption = async () =>{
-        if(isFolderEditable === true){
-            await context.recordsContract.denyFolderEdit();
-        }else{
-            await context.recordsContract.allowFolderEdit();
-        }
-        navigate("/home");
-    };
-
-
-    const changeEdit = () =>{
-        if(isFolderEditable === true){
-            setDisabled(disabled ? false:true);
-        }else{
-            alert("Užívateľ zakázal editovanie.")
-        }
-    };
-
-    const addRecord = () => {
-        if(isFolderEditable === true){
-            if(isCreatingRecord){
-                if(newRecordData.data !== "" && newRecordData.title !== ""){
-                    file.records.unshift(newRecordData);
-                    setDisabled(true);
-                }
-            }else{
-                setNewRecordData(new RecordData("DOCTORID","",""));
-            }
-            setIsCreatingRecord(isCreatingRecord ? false:true);
-        }else{
-            alert("Užívateľ zakázal editovanie.")
-        }
-        
-    };
 
     const handleSubmit = (event) =>{
         event.preventDefault();
@@ -77,37 +40,14 @@ function ViewRecords() {
         }
     };
 
-    const handleChange = (e) => {
-        const key = e.target.name;
-        const value = e.target.value;   
-        setFile(prev => ({
-            ...prev,
-            [key]: value
-          }));
-    };
-    
-    const handleChangeNewRecord = (e) => {
-        const key = e.target.name;
-        const value = e.target.value;   
-        setNewRecordData(prev => ({
-            ...prev,
-            [key]: value
-            }));
-    };
-
-    const getPublicKeys = async (address) => {
-        let addr = EthersUtils.getAddress(address);
-        let result = await context.recordsContract
-                                .getPublicKey(addr);
-        return JSON.parse(result);
-    }
-
     const uploadFile = async ()  => {
         try {
-            const myPublic = await getPublicKeys(mainFileOwner);
-            const patientsPublic = await getPublicKeys(file.address);
+            const myPublic = await getPublicKey(mainFileOwner);
+            const patientsPublic = await getPublicKey(file.address);
             let fileString = JSON.stringify(file);
             let myEncFile = await stringToEncryptedFile(fileString, myPublic);
+            console.log(myEncFile);
+
             let patientEncFile = await stringToEncryptedFile(fileString,patientsPublic);
 
             const myFileHash = await context.ipfsClient.add(myEncFile);
@@ -144,91 +84,85 @@ function ViewRecords() {
         
     };
 
-
-    const importKey = async (publicKeyRaw) =>{
-        return await window.crypto.subtle.importKey("jwk", 
-                                        publicKeyRaw,
-                                        {
-                                        name: "RSA-OAEP",
-                                        modulusLength: 2048,
-                                        publicExponent: new Uint8Array([1, 0, 1]),
-                                        hash: "SHA-256"
-                                    },
-                                    true,
-                                    ["encrypt"]);
-    };
-    const rsaEncrypt = async (message, publicKey) =>{
-        let encodedMessage = encoder.encode(message);
-        return await window.crypto.subtle.encrypt(
-            {
-                name: "RSA-OAEP"
-            },
-            publicKey,
-            encodedMessage
-            );
-    };
-    const getAESKeyIV = async () => {
-        const algoKeyGen = {
-            name: 'AES-GCM',
-            length: 256
-          };
-        const keyUsages = [
-        'encrypt',
-        'decrypt'
-        ];
-        var key = await window.crypto.subtle.generateKey(algoKeyGen, true, keyUsages);
-        var iv = window.crypto.getRandomValues(new Uint8Array(12));
-
-        let res = {
-            "iv":iv,
-            "key":key
-        };
-        return res;
-    };
-    const aesEncrypt = async (message, key, iv) =>{
-        var algoEncrypt = {
-            name: 'AES-GCM',
-            iv: iv,
-            tagLength: 128
-          };
-       return await window.crypto.subtle
-                            .encrypt(algoEncrypt, key, str2ab(message));
-    };
-    const exportAESKeyString = async (key) =>{
-        const exported =  await window.crypto.subtle.exportKey(
-            "jwk",
-            key
-          );
-        return JSON.stringify(exported);
-    };
     const stringToEncryptedFile = async (fileString, publicKeyRaw)  => {
-        var aesKeyIV = await getAESKeyIV();
-
+        var publicKey = await importRSAKeyPublic(publicKeyRaw);
+        var aesKeyIV = await generateAESKeyIV();
         var cipherText = await aesEncrypt(fileString, aesKeyIV.key, aesKeyIV.iv);
-
-        let publicKey = await importKey(publicKeyRaw);
-        
         var exportedKey = await exportAESKeyString(aesKeyIV.key);
+        console.log(exportedKey);
+        console.log(publicKey);
         let encryptedKey = await rsaEncrypt(exportedKey, publicKey);
-        console.log(aesKeyIV.iv);
+        console.log(aesKeyIV);
         var fileToUpload = new File([aesKeyIV.iv,encryptedKey,cipherText], "foo.txt", {
             type: "text/plain",
             });
         return fileToUpload;
     }; 
-    const str2ab = (str) => {
-        const buffer = new ArrayBuffer(str.length * 2);
-        const bufferInterface = new Uint8Array(buffer);
-        Array.from(str)
-          .forEach((_, index) => bufferInterface[index] = str.charCodeAt(index));
-        return buffer;
+    
+    const getPublicKey = async (address) => {
+        let addr = EthersUtils.getAddress(address);
+        let result = await context.accManagerContract
+                                .getPublicKey(addr);
+        return JSON.parse(result);
     };
 
+    const changeFolderEditOption = async () =>{
+        if(isFolderEditable === true){
+            await context.recordsContract.denyFolderEdit();
+        }else{
+            await context.recordsContract.allowFolderEdit();
+        }
+        navigate("/home");
+    };
+
+    const changeEdit = () =>{
+        if(isFolderEditable === true){
+            setDisabled(disabled ? false:true);
+        }else{
+            alert("Užívateľ zakázal editovanie.")
+        }
+    };
+
+    const addRecord = () => {
+        if(isFolderEditable === true){
+            if(isCreatingRecord){
+                if(newRecordData.data !== "" && newRecordData.title !== ""){
+                    file.records.unshift(newRecordData);
+                    setDisabled(true);
+                }
+            }else{
+                setNewRecordData(new RecordData("DOCTORID","",""));
+            }
+            setIsCreatingRecord(isCreatingRecord ? false:true);
+        }else{
+            alert("Užívateľ zakázal editovanie.")
+        }
+    };
+
+    const handleChange = (e) => {
+        const key = e.target.name;
+        const value = e.target.value;   
+        setFile(prev => ({
+            ...prev,
+            [key]: value
+          }));
+    };
+    
+    const handleChangeNewRecord = (e) => {
+        const key = e.target.name;
+        const value = e.target.value;   
+        setNewRecordData(prev => ({
+            ...prev,
+            [key]: value
+            }));
+    };
 
     return (
-    <Container id="viewForm" className="bg primary">
-        <Form onSubmit={handleSubmit} className="justify-content-center m-auto mt-2">
-            <Row className="mt-2">
+        <Container>
+    <Container id="viewForm" className="justify-content-center md-0 mt-3">
+        <Form onSubmit={handleSubmit} >
+            <Row></Row>
+            <Row className="mt-3">
                 <Col>
                     <Form.Group className="xs-3">
                         <Form.Label>Meno</Form.Label>
@@ -256,96 +190,112 @@ function ViewRecords() {
                     </Form.Group>
                 </Col>
             </Row> 
+            <Row>
+                <Form.Group className="xs-3">
+                            <Form.Label>Adresa vlastníka hlavného súboru</Form.Label>
+                            <Form.Control disabled={disabled} value={mainFileOwner} onChange={(e) => setMainFileOwner(e.target.value)} name="mainFileOwner" type="text"/>
+                </Form.Group>  
+            </Row>
             { role==="DOCTOR_ROLE"?  
                 <Row>
-                <Row className="mt-2">
-                    <Col>
-                        <Button
-                            onClick={changeEdit}
-                        >
-                            {disabled? "Povoliť editovanie":"Uložiť zmeny"}
-                        </Button>
-                    </Col>
-                    <Col>
-                    </Col>
-                    <Col>
-                        <Button
-                        type="submit"
-                        >
-                            Odoslať zmeny
-                        </Button>
-                    </Col>
-                    <Col>
+                    <Row className="mt-2">
+                        <Col>
+                            <Button
+                                onClick={changeEdit}
+                            >
+                                {disabled? "Povoliť editovanie":"Uložiť zmeny"}
+                            </Button>
+                        </Col>
+                    </Row>
+                </Row>
+                
+            :
+            <Row >
+                <Col md="4" className="m-auto">
+                    <Button
+                        onClick={changeFolderEditOption}
+                    >
+                        {isFolderEditable? "Zakázať editovanie zložky":"Povoliť editovanie zložky"}
+                    </Button>
+                </Col>
+            </Row>             
+            }
+            </Form>
+            <Row className="mt-4"></Row>
+            </Container >
+
+            <Container  id="viewForm" className="mt-2" >
+            <Form>
+                <Row></Row>
+                <Row className="mt-3" >
+                    {!isCreatingRecord? 
+                        <Carousel interval={null} wrap={false}>
+                        {file.records.map(item =>{
+                            return(
+                                <Carousel.Item key={Math.random()} >
+                                        <Row>
+                                            <Col>
+                                                <Form.Group className="md">
+                                                    <Form.Label>Title</Form.Label>
+                                                <Form.Control value={item.title} onChange={handleChange} disabled={disabled} name ="title" type="text"/>
+                                                </Form.Group>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label> Záznam </Form.Label>
+                                                <Form.Control value={item.data} onChange={handleChange} disabled={disabled} name ="recordData" as="textarea" rows={15} />
+                                            </Form.Group>
+                                        </Row>
+                                </Carousel.Item>
+                            );
+                        })}
+                    </Carousel>
+                    :<Row>
+                    <Row>
+                        <Col>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Title</Form.Label>
+                            <Form.Control value={newRecordData.title} onChange={handleChangeNewRecord} name ="title" type="text"/>
+                            </Form.Group>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Form.Group className="mb-3">
+                            <Form.Label> Záznam </Form.Label>
+                            <Form.Control value={newRecordData.data} onChange={handleChangeNewRecord} name ="data" as="textarea" rows={15} />
+                        </Form.Group>
+                    </Row>
+                    </Row>}
+                </Row>
+                {role==="DOCTOR_ROLE"?
+                <Row>
+                <Row className="justify-content-center m-auto mt-1">
+                <Col xs>
                         <Button
                             onClick={addRecord}
                         >
                             {!isCreatingRecord? "Pridať záznam":"Uložiť nový záznam"}
                         </Button>
                     </Col>
-                </Row>
-
-
-                <Form.Group className="xs-3">
-                        <Form.Label>Adresa vlastníka hlavného súboru</Form.Label>
-                        <Form.Control disabled={disabled} value={mainFileOwner} onChange={(e) => setMainFileOwner(e.target.value)} name="mainFileOwner" type="text"/>
-                </Form.Group>   
-
-                </Row>
-            :<Row >
-            <Col md="4" className="m-auto">
-                <Button
-                    onClick={changeFolderEditOption}
-                >
-                    {isFolderEditable? "Zakázať editovanie zložky":"Povoliť editovanie zložky"}
-                </Button>
-            </Col>
-        </Row>             
-            }
-            
-            <Row className="mt-5">
-                {!isCreatingRecord? 
-                    <Carousel interval={null} wrap={false}>
-                        {file.records.map(item =>{
-                            return(
-                                <Row>
-                                    <Carousel.Item key={Math.random()}>
-                                            <Row>
-                                                <Col>
-                                                    <Form.Group className="md">
-                                                        <Form.Label>Title</Form.Label>
-                                                    <Form.Control value={item.title} onChange={handleChange} disabled={disabled} name ="title" type="text"/>
-                                                    </Form.Group>
-                                                </Col>
-                                            </Row>
-                                            <Row>
-                                                <Form.Group className="mb-3">
-                                                    <Form.Label> Záznam </Form.Label>
-                                                    <Form.Control value={item.data} onChange={handleChange} disabled={disabled} name ="recordData" as="textarea" rows={15} />
-                                                </Form.Group>
-                                            </Row>
-                                    </Carousel.Item>
-                                </Row>
-                            );
-                        })}
-                    </Carousel>
-                :<>
-                <Row>
-                    <Col>
-                        <Form.Group className="md">
-                            <Form.Label>Title</Form.Label>
-                        <Form.Control value={newRecordData.title} onChange={handleChangeNewRecord} name ="title" type="text"/>
-                        </Form.Group>
+                <Col lg></Col>
+                    
+                
+                    
+                    <Col lg></Col>
+                    <Col xs>
+                        <Button
+                        type="submit"
+                        >
+                            Odoslať zmeny
+                        </Button>
                     </Col>
                 </Row>
-                <Row>
-                    <Form.Group className="mb-3">
-                        <Form.Label> Záznam </Form.Label>
-                        <Form.Control value={newRecordData.data} onChange={handleChangeNewRecord} name ="data" as="textarea" rows={15} />
-                    </Form.Group>
+                <Row className="mt-2"></Row>
                 </Row>
-                </>}
-            </Row>
-        </Form>
+            :<></>}
+            </Form>
+    </Container>
     </Container>
     );
 }

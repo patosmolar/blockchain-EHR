@@ -1,29 +1,45 @@
-import React, { useState } from "react";
+import React, { useState,useRef } from "react";
 import { ethers } from "ethers";
-import { Button, Card, Container } from "react-bootstrap";
+import { Button, Card, Container, Form } from "react-bootstrap";
 import {recordsABI, aManagerABI, accManagerAddress, medRecordsAddress} from "../contractsConfig.js";
 import SmartContractsContext from "../shared/SmartContractsContext";
 import { useNavigate } from "react-router-dom";
 import EthersUtils from "ethers-utils";
+import {unwrapRsaPrivate,stringToArrayBuffer, arrayBufferToString, importRSAKeyPublic, importRSAKeyPrivate} from "../shared/Utils";
 
 function Login() {
     const context = React.useContext(SmartContractsContext);
-    const [isDeviceRegistered, setIsDeviceRegistered] = useState(true);
-    const [force, setForce] = useState(false);
+    const [isRegistered, setIsRegistered] = useState(true);
     const { ethereum } = window;
+    let password = useRef(null);
     const navigate = useNavigate();
 
-    const checkIfRegistered = (account) => {
-      var keys = localStorage.getItem(account);
-      console.log(keys);
-      if(keys !== null){
-          keys = JSON.parse(keys);
-          context.setPublicKey(JSON.parse(keys.publicKey));
-          context.setPrivateKey(JSON.parse(keys.privateKey));
-          setIsDeviceRegistered(true);
-          navigate("/home");
+    const checkIfRegistered = async (account, accManager) => {
+      var isRegistered = await accManager.isAccountRegistered(account);
+      if(isRegistered === true){
+          var privateKey = await accManager.getPrivateKey();
+          var publicKey = await accManager.getPublicKey(account);
+          if(privateKey === "{}"){
+            setIsRegistered(true);
+            navigate("/home");
+            return;
+          }
+          publicKey = await importRSAKeyPublic(JSON.parse(publicKey));
+          context.setPublicKey(publicKey);
+          try {
+            var unwrapped = await unwrapRsaPrivate(stringToArrayBuffer(privateKey), password.current.value);
+            context.setPrivateKey(unwrapped);
+            setIsRegistered(true);
+            navigate("/home");
+          } catch (error) {
+            alert("Nesprávne heslo k účtu "+account );
+            password.current.value = "";
+            context.setLogedUserType("NAN");
+            navigate("/login");
+          }
+          
          } else{
-          setIsDeviceRegistered(false);
+          setIsRegistered(false);
          }
     }
     
@@ -62,7 +78,7 @@ function Login() {
           context.setRecordsContract(records);
           context.setAccManagerContract(accountsManager);
           context.setAccount(accounts[0]);
-          checkIfRegistered(accounts[0]);
+          await checkIfRegistered(accounts[0], accountsManager);
         } catch (error) {
           alert(error);
         }
@@ -71,44 +87,7 @@ function Login() {
       }
     };
 
-    const generateKeyPair =  async () => {
-      let keyPair = await window.crypto.subtle.generateKey(
-        {
-          name: "RSA-OAEP",
-          modulusLength: 2048,
-          publicExponent: new Uint8Array([1, 0, 1]),
-          hash: "SHA-256"
-        },
-        true,
-        ["encrypt", "decrypt"]
-      );
-      let privKey = await window.crypto.subtle.exportKey("jwk", keyPair.privateKey);
-      let publicKey = await window.crypto.subtle.exportKey("jwk", keyPair.publicKey);
-      const storable = {
-        "account":context.account,
-        "privateKey":JSON.stringify(privKey),
-        "publicKey":JSON.stringify(publicKey)
-      };
-      localStorage.setItem(context.account, JSON.stringify(storable));
-      const registered = await registerDevice();
-      if(registered === true){
-        checkIfRegistered(context.account);
-      }
-    }
-
-    const registerDevice = async() => {
-      let keys = localStorage.getItem(context.account);
-      keys = JSON.parse(keys);
-      try {
-      await context.recordsContract.registerDevice(keys.publicKey.toString(), force);
-      return true;
-      } catch (error) {
-        setForce(true);
-        return false;
-      }
-    };
-
-    if(isDeviceRegistered){
+    if(isRegistered){
       return(
         <Container className="w-50 ">
           <Card className="text-center mt-5 blue lighten-5">
@@ -116,9 +95,17 @@ function Login() {
               <strong>Účet neprihlásený, prosím prihláste sa</strong>
             </Card.Header>
             <Card.Body >
+              <Form>
+                <Form.Group className="mb-3" controlId="password">
+                                    <Form.Label>Heslo</Form.Label>
+                                    <Form.Control ref={password} type="password" />
+                                    <Form.Text className="text-muted">
+                                    </Form.Text>
+                </Form.Group>
               <Button variant="info" onClick={connectButtonHandler}>
                 Prihlásiť sa
               </Button >
+              </Form>
             </Card.Body>     
           </Card>
         </Container>
@@ -128,18 +115,11 @@ function Login() {
       <Container>
         <Card className="text-center mt-5 blue lighten-5">
           <Card.Header>
-            {force?            
-            <strong>Účet {context.account} už má registráciu, chcete vymazať starú a vytvoriť novu?</strong>
-            :<strong>Zaregistrovať zariadenie pre účet {context.account}</strong>
-            }
+            <strong>Účet nie je registrovaný {context.account}</strong>
           </Card.Header>
           <Card.Body>
-            <Button variant="info" onClick={generateKeyPair}>
-            {force?
-            <>Prepísať pôvodnú registráciu</>
-            :
-            <>Registrovať zariadenie</>
-            } 
+            <Button variant="info">
+            <>Požiadať o registráciu</>
           </Button>
           </Card.Body>
         </Card>
