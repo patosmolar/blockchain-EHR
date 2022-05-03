@@ -11,44 +11,77 @@ function Home() {
   const [isLoading, setLoading] = useState(false);
   const navigate = useNavigate();
   var role = context.logedUserType;
-  const createNewRecord = (event) =>{
-    event.preventDefault();
-    var file = new RecordFile(event.target.patientAddress.value);
-    context.setRecordFile(file);
-    navigate("/viewRecords/true");
-  }
+
+
+  const addressHaveDeviceRegistration = async (address) =>{
+    var publicKey = await context.recordsContract.getPublicKey(EthersUtils.getAddress(address));
+    return publicKey.length > 10;
+  };
+
+
 
   const loadMyData = async (event) => {
     event.preventDefault();
     setLoading(true);
-    var fileRaw = await getRawFileFromAddressPatient();
-    var keyIVData = await extractKeyIVData(fileRaw);
-    var file = await aesDecrypt(keyIVData.data, keyIVData.key, keyIVData.IV);
-    var rawFileString = ab2str(file);
-    var ch = rawFileString[rawFileString.length-1];
-    var parsable = rawFileString.replaceAll(ch, "");
-    console.log(parsable);
-    context.setRecordFile(JSON.parse(parsable));
+    try {
+      var fileRaw = await getRawFileFromAddressPatient();
+      var keyIVData = await extractKeyIVData(fileRaw);
+      var file = await aesDecrypt(keyIVData.data, keyIVData.key, keyIVData.IV);
+      var rawFileString = ab2str(file);
+      var ch = rawFileString[rawFileString.length-1];
+      var parsable = rawFileString.replaceAll(ch, "");
+      console.log(parsable);
+      context.setRecordFile(JSON.parse(parsable));
+      navigate("/viewRecords/false");
+    } catch (error) {
+      alert("Nepodarilo sa načítať pacientovu zložku.");
+    }
     setLoading(false);
-    navigate("/viewRecords/false");
   };
 
   const loadPatientData = async (event) =>
   {
     event.preventDefault();
     setLoading(true);
-    var fileRaw = await getRawFileFromAddress(event.target.patientAddress.value);
-    var keyIVData = await extractKeyIVData(fileRaw);
-    var file = await aesDecrypt(keyIVData.data, keyIVData.key, keyIVData.IV);
-    var rawFileString = ab2str(file);
-    var ch = rawFileString[rawFileString.length-1];
-    var parsable = rawFileString.replaceAll(ch, "");
-    console.log(parsable);
-    context.setRecordFile(JSON.parse(parsable));
+    var exists = false;
+    try {
+      exists = await context.recordsContract.medicalFolderExists(event.target.patientAddress.value);
+    } catch (error) {
+      alert(error);
+    }
+
+    if(exists === true){
+      try {
+        var fileRaw = await getRawFileFromAddress(event.target.patientAddress.value);
+        var keyIVData = await extractKeyIVData(fileRaw);
+        var file = await aesDecrypt(keyIVData.data, keyIVData.key, keyIVData.IV);
+        var rawFileString = ab2str(file);
+        var ch = rawFileString[rawFileString.length-1];
+        var parsable = rawFileString.replaceAll(ch, "");
+        context.setRecordFile(JSON.parse(parsable));
+        navigate("/viewRecords/false");
+      } catch (error) {
+        alert("Nepodarilo sa načítať pacientovu zložku.");
+      }
+    }else{
+      await createMedicalFolder(event.target.patientAddress.value);
+    }
+    
     setLoading(false);
-    navigate("/viewRecords/false");
   };
 
+  const createMedicalFolder = async (patientAddress) =>{
+    var checkRegistration = await addressHaveDeviceRegistration(patientAddress);
+    if(checkRegistration === true){
+      var file = new RecordFile(patientAddress);
+      context.setRecordFile(file);
+      navigate("/viewRecords/true");
+    }else{
+      alert("Pacient nemá zaregistrované zariadenie.");
+    }
+    setLoading(false);
+  };
+  
   const getRawFileFromAddressPatient = async () =>{
     let path = await context.recordsContract.getMediacalRecordPatient();
     const chunks = []
@@ -60,20 +93,17 @@ function Home() {
 
   const getRawFileFromAddress = async (addr) =>{
     let address = EthersUtils.getAddress(addr);
-    let path = await context.recordsContract.getMediacalRecordDoctor(address);
-    const chunks = []
-    for await (const chunk of context.ipfsClient.cat(path)) {
-      chunks.push(chunk)
+    try {
+      let path = await context.recordsContract.getMediacalRecordDoctor(address);
+      const chunks = []
+      for await (const chunk of context.ipfsClient.cat(path)) {
+        chunks.push(chunk)
+      }
+      return Buffer.concat(chunks);
+    } catch (error) {
+      alert("Nemáte potrebné povolenie pre pacientovu zložku.");
+      throw error;
     }
-    return Buffer.concat(chunks);
-  };
-
-  const str2ab = (str) => {
-    const buffer = new ArrayBuffer(str.length * 2);
-    const bufferInterface = new Uint8Array(buffer);
-    Array.from(str)
-      .forEach((_, index) => bufferInterface[index] = str.charCodeAt(index));
-    return buffer;
   };
 
   const ab2str = (buffer) =>{
@@ -87,7 +117,6 @@ function Home() {
 
     var decryptedKeyExp = await rsaDecrypt(rawKey, privKey);
     var k = JSON.parse(ab2str(decryptedKeyExp));
-    console.log(k);
     var impKey = await importAESKey(k);
     var data = fileRaw.slice(268,fileRaw.length);
     return {"key":impKey, "IV":rawIV, "data":data};
@@ -116,7 +145,6 @@ function Home() {
     );
   };
 
-
   const rsaDecrypt = async (cipher, privateKey) =>{
       return await window.crypto.subtle.decrypt(
         {
@@ -143,7 +171,7 @@ if(role ==="DOCTOR_ROLE"){
             <Col>
                 <Card className="text-center">
                     <Card.Header>
-                        Načítať údaje o pacientovi {"0x2C9353499784c1D3BBA16648903BAa030d3452f1"}
+                        Načítať údaje o pacientovi
                     </Card.Header>
                     <Card.Body>
                         <Form onSubmit={loadPatientData}>
@@ -163,30 +191,6 @@ if(role ==="DOCTOR_ROLE"){
                         </Form>
                     </Card.Body>
                 </Card>
-            </Col>
-            <Col>
-            <Card className="text-center blue lighten-5">
-                    <Card.Header>
-                        Vytvoriť záznam pre nového pacienta {"0x2C9353499784c1D3BBA16648903BAa030d3452f1"}
-                    </Card.Header>
-                    <Card.Body>
-                        <Form onSubmit={createNewRecord}>
-                            <Form.Group className="md">
-                                <Form.Label>Adresa pacienta</Form.Label>
-                                <Form.Control name ="patientAddress" type="text" placeholder="0x1an.." />
-                            </Form.Group>
-                            <Form.Group className="mt-2" >
-                                <Button
-                                variant="info"
-                                type="submit"
-                                disabled={isLoading}
-                                >
-                                {isLoading ? 'Načítavam...' : 'Načítať'}
-                                </Button>
-                            </Form.Group>
-                        </Form>
-                    </Card.Body>
-              </Card>
             </Col>
         </Row>
     </Container>

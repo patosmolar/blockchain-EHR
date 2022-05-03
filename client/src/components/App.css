@@ -9,11 +9,12 @@ body,
 #root {
     height: 100%;
     background-image: url("../../public/bg.jpg");
+    background-size: cover;
 }
 
 #viewForm {
     background-image: linear-gradient(to bottom right, #f4faff, #f4faff);
-    border-radius: 25px;
+    border-radius: 5px;
 }
 
 .carousel-control-next-icon,
@@ -26,8 +27,8 @@ body,
 }
 
 .card {
-    border-bottom-left-radius: 25px;
-    border-bottom-right-radius: 25px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 .card-header {
@@ -36,8 +37,8 @@ body,
 
 .navbar {
     background-color: #ffffff;
-    border-bottom-left-radius: 25px;
-    border-bottom-right-radius: 25px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 .App {

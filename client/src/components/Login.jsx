@@ -9,12 +9,14 @@ import EthersUtils from "ethers-utils";
 function Login() {
     const context = React.useContext(SmartContractsContext);
     const [isDeviceRegistered, setIsDeviceRegistered] = useState(true);
+    const [force, setForce] = useState(false);
     const { ethereum } = window;
     const navigate = useNavigate();
 
     const checkIfRegistered = (account) => {
       var keys = localStorage.getItem(account);
-      if(keys != undefined){
+      console.log(keys);
+      if(keys !== null){
           keys = JSON.parse(keys);
           context.setPublicKey(JSON.parse(keys.publicKey));
           context.setPrivateKey(JSON.parse(keys.privateKey));
@@ -45,13 +47,15 @@ function Login() {
           }catch(error){
             const isDoc = await accountsManager.isMemberOf(ethers.utils.formatBytes32String("DOCTOR_ROLE"), EthersUtils.getAddress(accounts[0]));
             if(isDoc === true){
+              console.log("DOCTOR_ROLE");
               context.setLogedUserType("DOCTOR_ROLE");
             }else{
               let isPatient = await accountsManager.isMemberOf(ethers.utils.formatBytes32String("PATIENT_ROLE"), EthersUtils.getAddress(accounts[0]));
               if(isPatient === true){
                 context.setLogedUserType("PATIENT_ROLE");
               }else{
-                throw "Účet nie je zaregistrovaný";
+                alert("Účet nie je zaregistrovaný!")
+                navigate("/login");
               }
             }
           }
@@ -86,15 +90,22 @@ function Login() {
         "publicKey":JSON.stringify(publicKey)
       };
       localStorage.setItem(context.account, JSON.stringify(storable));
-      await registerDevice();
-      checkIfRegistered(context.account);
+      const registered = await registerDevice();
+      if(registered === true){
+        checkIfRegistered(context.account);
+      }
     }
 
     const registerDevice = async() => {
       let keys = localStorage.getItem(context.account);
       keys = JSON.parse(keys);
-      await context.recordsContract
-                                  .registerDevice(keys.publicKey.toString());
+      try {
+      await context.recordsContract.registerDevice(keys.publicKey.toString(), force);
+      return true;
+      } catch (error) {
+        setForce(true);
+        return false;
+      }
     };
 
     if(isDeviceRegistered){
@@ -103,7 +114,6 @@ function Login() {
           <Card className="text-center mt-5 blue lighten-5">
             <Card.Header>
               <strong>Účet neprihlásený, prosím prihláste sa</strong>
-              {context.account.toString()}
             </Card.Header>
             <Card.Body >
               <Button variant="info" onClick={connectButtonHandler}>
@@ -118,11 +128,18 @@ function Login() {
       <Container>
         <Card className="text-center mt-5 blue lighten-5">
           <Card.Header>
-            <strong>Zaregistrovať zariadenie pre účet {context.account}</strong>
+            {force?            
+            <strong>Účet {context.account} už má registráciu, chcete vymazať starú a vytvoriť novu?</strong>
+            :<strong>Zaregistrovať zariadenie pre účet {context.account}</strong>
+            }
           </Card.Header>
           <Card.Body>
             <Button variant="info" onClick={generateKeyPair}>
-            Registrovať zariadenie
+            {force?
+            <>Prepísať pôvodnú registráciu</>
+            :
+            <>Registrovať zariadenie</>
+            } 
           </Button>
           </Card.Body>
         </Card>

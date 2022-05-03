@@ -1,5 +1,5 @@
-export const accManagerAddress = "0xD0f71a500E58444b8f267ED4BD19B057e3E27915";
-export const medRecordsAddress = "0xca83F1a272787F55F0b96543329B51Cb578C8E8C";
+export const accManagerAddress = "0xA4Ab63b1201B6e205025C16aA7812df4827a9353";
+export const medRecordsAddress = "0x6E7C963D7228D8f55f33d00CB8B4478Eab45ed9A";
 
 export const recordsABI = [{
         "inputs": [{
@@ -32,31 +32,49 @@ export const recordsABI = [{
                 "type": "address"
             }
         ],
-        "name": "addMedicalRecord",
+        "name": "addMedicalFolder",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "allowFolderEdit",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
         "inputs": [{
-                "internalType": "address",
-                "name": "patientPublicAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "newOwner",
-                "type": "address"
-            },
-            {
-                "internalType": "string",
-                "name": "newFileHash",
-                "type": "string"
-            }
-        ],
-        "name": "changeMainFileOwnership",
+            "internalType": "address",
+            "name": "patientAddress",
+            "type": "address"
+        }],
+        "name": "deleteMedicalFolder",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "denyFolderEdit",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "address",
+            "name": "patientAddress",
+            "type": "address"
+        }],
+        "name": "getFolderEditState",
+        "outputs": [{
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+        }],
+        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -103,26 +121,42 @@ export const recordsABI = [{
     {
         "inputs": [{
             "internalType": "address",
-            "name": "",
+            "name": "patientAddress",
             "type": "address"
         }],
-        "name": "publicKeys",
+        "name": "medicalFolderExists",
         "outputs": [{
-            "internalType": "string",
+            "internalType": "bool",
             "name": "",
-            "type": "string"
+            "type": "bool"
         }],
         "stateMutability": "view",
         "type": "function"
     },
     {
         "inputs": [{
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-        }],
-        "name": "records",
-        "outputs": [{
+                "internalType": "string",
+                "name": "publicKey",
+                "type": "string"
+            },
+            {
+                "internalType": "bool",
+                "name": "force",
+                "type": "bool"
+            }
+        ],
+        "name": "registerDevice",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "address",
+                "name": "patientAddress",
+                "type": "address"
+            },
+            {
                 "internalType": "string",
                 "name": "mainFileHash",
                 "type": "string"
@@ -134,20 +168,11 @@ export const recordsABI = [{
             },
             {
                 "internalType": "address",
-                "name": "mainFileCurrentOwner",
+                "name": "mainFileOwner",
                 "type": "address"
             }
         ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-            "internalType": "string",
-            "name": "publicKey",
-            "type": "string"
-        }],
-        "name": "registerDevice",
+        "name": "updateMedicalRecord",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -308,6 +333,21 @@ export const aManagerABI = [{
     },
     {
         "inputs": [{
+            "internalType": "address",
+            "name": "doctorAddr",
+            "type": "address"
+        }],
+        "name": "isDoctorRegistered",
+        "outputs": [{
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
                 "internalType": "bytes32",
                 "name": "roleId",
                 "type": "bytes32"
@@ -377,6 +417,28 @@ export const aManagerABI = [{
             }
         ],
         "name": "renounceRole",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "address",
+            "name": "doctorAddress",
+            "type": "address"
+        }],
+        "name": "revokeDoctor",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "address",
+            "name": "patientAddress",
+            "type": "address"
+        }],
+        "name": "revokePatient",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
