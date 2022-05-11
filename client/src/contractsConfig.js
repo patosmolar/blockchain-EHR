@@ -1,5 +1,5 @@
-export const accManagerAddress = "0x53E539Ef16BDda446987C46C940F9CB6935b41DF";
-export const medRecordsAddress = "0x2E2A697B9120bD3160d7A481Bbf4C51192C19E91";
+export const accManagerAddress = "0x370a1A045b22071fFaD492e0f1E04b67980D4479";
+export const medRecordsAddress = "0x03d59F94Da00f6B605aB0facf248DED87CD1029F";
 
 export const recordsABI = [{
         "inputs": [{
@@ -140,7 +140,7 @@ export const recordsABI = [{
                 "type": "address"
             }
         ],
-        "name": "updateMedicalRecord",
+        "name": "updateMedicalFolder",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -227,6 +227,39 @@ export const aManagerABI = [{
     {
         "inputs": [],
         "name": "DEFAULT_ADMIN_ROLE",
+        "outputs": [{
+            "internalType": "bytes32",
+            "name": "",
+            "type": "bytes32"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "DOCTOR_ROLE",
+        "outputs": [{
+            "internalType": "bytes32",
+            "name": "",
+            "type": "bytes32"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "PATIENT_ROLE",
+        "outputs": [{
+            "internalType": "bytes32",
+            "name": "",
+            "type": "bytes32"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "REGISTERED_USER_ROLE",
         "outputs": [{
             "internalType": "bytes32",
             "name": "",
@@ -363,7 +396,7 @@ export const aManagerABI = [{
             },
             {
                 "internalType": "address",
-                "name": "ad",
+                "name": "addr",
                 "type": "address"
             }
         ],

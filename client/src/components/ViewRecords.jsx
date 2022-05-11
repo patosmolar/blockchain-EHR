@@ -63,7 +63,7 @@ function ViewRecords() {
                 }
             }else{
                 try{
-                    await context.recordsContract.updateMedicalRecord(EthersUtils.getAddress(file.address),
+                    await context.recordsContract.updateMedicalFolder(EthersUtils.getAddress(file.address),
                                                                         myFileHash.path,
                                                                         patientsFileHash.path,
                                                                         mainFileOwner);
@@ -285,7 +285,7 @@ function ViewRecords() {
                     <Col lg></Col>
                     <Col xs>
                         <Button
-                        type="submit"
+                        onClick={handleSubmit}
                         >
                             Odoslať zmeny
                         </Button>

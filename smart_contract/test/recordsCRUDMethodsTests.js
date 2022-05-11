@@ -15,12 +15,12 @@ describe("MedicalRecords", function() {
         await records.deployed();
 
         await records.connect(addr1).addMedicalFolder(addr2.address,
-            "mainFileHash",
-            "patientFileHash",
+            "ecd73f75e1b47c73bda27f89458fbf6e7ecdca8ca3c1ace5d9e4bd45f4ba0ffc",
+            "ecd73f75e1b47c73bda27f89458fbf6e7ecdca8ca3c1ace5d9e4bd45f4ba0ffc",
             addr1.address);
 
         var r1 = await records.connect(addr1).getMediacalRecordDoctor(addr2.address);
-        expect(r1).to.equal("mainFileHash");
+        expect(r1).to.equal("ecd73f75e1b47c73bda27f89458fbf6e7ecdca8ca3c1ace5d9e4bd45f4ba0ffc");
     });
     it("Doctor cannot add medical folder if aldredy added end get error", async function() {
         const [owner, addr1, addr2] = await ethers.getSigners();
@@ -104,7 +104,7 @@ describe("MedicalRecords", function() {
             "patientFileHash",
             owner.address);
 
-        await expect(records.connect(addr1).updateMedicalRecord(addr2.address, "a", "a", addr1.address)).to.be.revertedWith("Not mainFile owner");
+        await expect(records.connect(addr1).updateMedicalFolder(addr2.address, "a", "a", addr1.address)).to.be.revertedWith("Not mainFile owner");
     });
     it("Doctor cannot update mainFile patient denyed folder edit", async function() {
         const [owner, addr1, addr2] = await ethers.getSigners();
@@ -125,7 +125,7 @@ describe("MedicalRecords", function() {
 
         await records.connect(addr2).denyFolderEdit();
 
-        await expect(records.connect(owner).updateMedicalRecord(addr2.address, "a", "a", addr1.address)).to.be.revertedWith("Folder not editable");
+        await expect(records.connect(owner).updateMedicalFolder(addr2.address, "a", "a", addr1.address)).to.be.revertedWith("Folder not editable");
     });
     it("Doctor cannot update mainFile patient denyed folder edit and after allowing can", async function() {
         const [owner, addr1, addr2] = await ethers.getSigners();
@@ -146,11 +146,11 @@ describe("MedicalRecords", function() {
 
         await records.connect(addr2).denyFolderEdit();
 
-        await expect(records.connect(owner).updateMedicalRecord(addr2.address, "a", "a", owner.address)).to.be.revertedWith("Folder not editable");
+        await expect(records.connect(owner).updateMedicalFolder(addr2.address, "a", "a", owner.address)).to.be.revertedWith("Folder not editable");
 
         await records.connect(addr2).allowFolderEdit();
 
-        await records.connect(owner).updateMedicalRecord(addr2.address, "a", "a", owner.address);
+        await records.connect(owner).updateMedicalFolder(addr2.address, "a", "a", owner.address);
         var r1 = await records.connect(owner).getMediacalRecordDoctor(addr2.address);
         expect(r1).to.equal("a");
     });
@@ -171,7 +171,7 @@ describe("MedicalRecords", function() {
             "patientFileHash",
             owner.address);
 
-        await records.connect(owner).updateMedicalRecord(addr2.address, "a", "a", addr1.address);
+        await records.connect(owner).updateMedicalFolder(addr2.address, "a", "a", addr1.address);
         var r1 = await records.connect(addr1).getMediacalRecordDoctor(addr2.address);
         expect(r1).to.equal("a");
     });
@@ -214,5 +214,24 @@ describe("MedicalRecords", function() {
         await records.connect(addr2).denyFolderEdit();
 
         await expect(records.connect(owner).deleteMedicalFolder(addr2.address)).to.be.revertedWith("Folder not editable");
+    });
+    it("Doctor can delete folder", async function() {
+        const [owner, addr1, addr2] = await ethers.getSigners();
+        const AccountsManager = await ethers.getContractFactory("AccountsManager");
+        const manager = await AccountsManager.deploy();
+        await manager.deployed();
+        await manager.registerDoctor(addr1.address, "a", "a");
+        await manager.connect(addr1).registerNewPatient(addr2.address, "a", "a");
+
+        const Records = await ethers.getContractFactory("MedicalRecords");
+        const records = await Records.deploy(manager.address);
+        await records.deployed();
+
+        await records.connect(owner).addMedicalFolder(addr2.address,
+            "mainFileHash",
+            "patientFileHash",
+            owner.address);
+
+        await records.connect(owner).deleteMedicalFolder(addr2.address);
     });
 });

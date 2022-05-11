@@ -1,6 +1,11 @@
 require("@nomiclabs/hardhat-waffle");
-
+require("@nomiclabs/hardhat-solhint");
+require("hardhat-gas-reporter");
 module.exports = {
+    gasReporter: {
+        currency: "USD",
+        gasPrice: 90,
+    },
     solidity: "0.8.4",
     networks: {
         local: {

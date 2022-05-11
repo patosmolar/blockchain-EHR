@@ -10,7 +10,17 @@ function SmartContractsProvider({ children }) {
     const [account, setAccount] = useState("");
     const [privateKey, setPrivateKey] = useState({});
     const [publicKey, setPublicKey] = useState({});
-    const ipfsClient = create('https://ipfs.infura.io:5001/api/v0');
+
+    const projectId = "28tfbbVKXmsD5Xm5EadLMA0IdXw";
+    const projectSecret = "66efa7adda5ce009effd866eb7bf7b78";
+    const authorization = "Basic " + btoa(projectId + ":" + projectSecret);
+    const ipfsClient = create({
+        url: "https://ipfs.infura.io:5001/api/v0",
+        headers: {
+          authorization,
+        },
+      });
+   
     const [recordFile, setRecordFile] = useState({});
     const [logedUserType, setLogedUserType]= useState("NAN");
 

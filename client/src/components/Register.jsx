@@ -30,6 +30,8 @@ function Register() {
         var wrappedPrivate = await wrapRsaPrivate(keyPair.privateKey, patientsPassword.current.value);
         var stringedPrivate = arrayBufferToString(wrappedPrivate);
         var stringedPublic = JSON.stringify(await window.crypto.subtle.exportKey("jwk", keyPair.publicKey));
+        console.log(stringedPublic);
+        console.log(stringedPrivate);
         await context.accManagerContract
                                 .registerNewPatient(EthersUtils.getAddress(patientsAddressField.current.value),
                                 stringedPublic, stringedPrivate);
