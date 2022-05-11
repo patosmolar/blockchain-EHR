@@ -1,5 +1,3 @@
-const webpack = require('webpack');
-
 module.exports = function override(config) {
     const fallback = config.resolve.fallback || {};
     Object.assign(fallback, {
@@ -11,16 +9,8 @@ module.exports = function override(config) {
         "os": require.resolve("os-browserify"),
         "url": require.resolve("url"),
         "ipfs-http-client": require.resolve("ipfs-http-client"),
-        "ethers": require.resolve("ethers"),
-        "ethers-utils": require.resolve("ethers-utils"),
-        "crypto-js": require.resolve("crypto-js")
+        "ethers": require.resolve("ethers")
     })
     config.resolve.fallback = fallback;
-    config.plugins = (config.plugins || []).concat([
-        new webpack.ProvidePlugin({
-            process: 'process/browser',
-            Buffer: ['buffer', 'Buffer']
-        })
-    ])
     return config;
 }

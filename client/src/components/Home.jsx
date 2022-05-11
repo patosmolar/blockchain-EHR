@@ -1,7 +1,7 @@
 import React, { useState,useEffect  } from "react";
 import {Row, Col, Button, Card, Form, Container } from "react-bootstrap";
 import SmartContractsContext from "../shared/SmartContractsContext";
-import EthersUtils from "ethers-utils";
+import {utils} from "ethers";
 import { useNavigate } from "react-router-dom";
 import { RecordFile } from "../shared/fileTemplate";
 import { extractKeyIVDataFromRawFile, arrayBufferToString, aesDecrypt} from "../shared/Utils"
@@ -87,7 +87,7 @@ function Home() {
   };
 
   const getRawFileFromAddress = async (addr) =>{
-    let address = EthersUtils.getAddress(addr);
+    let address = utils.getAddress(addr);
     try {
       let path = await context.recordsContract.getMediacalRecordDoctor(address);
       const chunks = []

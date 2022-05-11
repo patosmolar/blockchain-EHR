@@ -1,7 +1,7 @@
 import React, { useRef  } from "react";
 import { Button, Form, Container, Col, Row, Card } from "react-bootstrap";
 import SmartContractsContext from "../shared/SmartContractsContext";
-import EthersUtils from "ethers-utils";
+import {utils} from "ethers";
 import {generateKeyPairRSA,wrapRsaPrivate, arrayBufferToString} from "../shared/Utils";
 
 
@@ -20,7 +20,7 @@ function Register() {
         var stringedPrivate = arrayBufferToString(wrappedPrivate);
         var stringedPublic = JSON.stringify(await window.crypto.subtle.exportKey("jwk", keyPair.publicKey));
         await context.accManagerContract
-                                .registerDoctor(EthersUtils.getAddress(doctorsAddressField.current.value),
+                                .registerDoctor(utils.getAddress(doctorsAddressField.current.value),
                                 stringedPublic, stringedPrivate);
     };
 
@@ -33,7 +33,7 @@ function Register() {
         console.log(stringedPublic);
         console.log(stringedPrivate);
         await context.accManagerContract
-                                .registerNewPatient(EthersUtils.getAddress(patientsAddressField.current.value),
+                                .registerNewPatient(utils.getAddress(patientsAddressField.current.value),
                                 stringedPublic, stringedPrivate);
     };
 

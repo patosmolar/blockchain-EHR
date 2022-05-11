@@ -4,7 +4,7 @@ import { Button, Card, Container, Form } from "react-bootstrap";
 import {recordsABI, aManagerABI, accManagerAddress, medRecordsAddress} from "../contractsConfig.js";
 import SmartContractsContext from "../shared/SmartContractsContext";
 import { useNavigate } from "react-router-dom";
-import EthersUtils from "ethers-utils";
+import {utils} from "ethers";
 import {unwrapRsaPrivate,stringToArrayBuffer, arrayBufferToString, importRSAKeyPublic, importRSAKeyPrivate} from "../shared/Utils";
 
 function Login() {
@@ -61,12 +61,12 @@ function Login() {
             await accountsManager.isAdmin();
             context.setLogedUserType("ADMIN_ROLE");
           }catch(error){
-            const isDoc = await accountsManager.isMemberOf(ethers.utils.formatBytes32String("DOCTOR_ROLE"), EthersUtils.getAddress(accounts[0]));
+            const isDoc = await accountsManager.isMemberOf(ethers.utils.formatBytes32String("DOCTOR_ROLE"), utils.getAddress(accounts[0]));
             if(isDoc === true){
               console.log("DOCTOR_ROLE");
               context.setLogedUserType("DOCTOR_ROLE");
             }else{
-              let isPatient = await accountsManager.isMemberOf(ethers.utils.formatBytes32String("PATIENT_ROLE"), EthersUtils.getAddress(accounts[0]));
+              let isPatient = await accountsManager.isMemberOf(ethers.utils.formatBytes32String("PATIENT_ROLE"), utils.getAddress(accounts[0]));
               if(isPatient === true){
                 context.setLogedUserType("PATIENT_ROLE");
               }else{

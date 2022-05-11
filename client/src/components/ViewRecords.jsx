@@ -1,10 +1,9 @@
 import React, { useState,useEffect  } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
 import {Row, Col, Button, Card, Form, Container, Carousel } from "react-bootstrap";
 import SmartContractsContext from "../shared/SmartContractsContext";
 import {RecordData} from "../shared/fileTemplate";
 import { useParams,useNavigate } from "react-router-dom";
-import EthersUtils from "ethers-utils";
+import {utils} from "ethers";
 import { generateAESKeyIV, aesEncrypt, importRSAKeyPublic, exportAESKeyString , rsaEncrypt  } from "../shared/Utils"
 
 function ViewRecords() {
@@ -22,7 +21,7 @@ function ViewRecords() {
 
     useEffect(() => {
         async function getEditableStatus() {
-            const isEditable = await context.recordsContract.getFolderEditState(EthersUtils.getAddress(file.address));
+            const isEditable = await context.recordsContract.getFolderEditState(utils.getAddress(file.address));
             setIsFileEditable(isEditable);
         }
         if(isNew === "false"){
@@ -54,7 +53,7 @@ function ViewRecords() {
             const patientsFileHash = await context.ipfsClient.add(patientEncFile);
             if(isNew === "true"){
                 try {
-                    await context.recordsContract.addMedicalFolder(EthersUtils.getAddress(file.address),
+                    await context.recordsContract.addMedicalFolder(utils.getAddress(file.address),
                                                                             myFileHash.path,
                                                                             patientsFileHash.path,
                                                                             mainFileOwner);
@@ -63,7 +62,7 @@ function ViewRecords() {
                 }
             }else{
                 try{
-                    await context.recordsContract.updateMedicalFolder(EthersUtils.getAddress(file.address),
+                    await context.recordsContract.updateMedicalFolder(utils.getAddress(file.address),
                                                                         myFileHash.path,
                                                                         patientsFileHash.path,
                                                                         mainFileOwner);
@@ -100,7 +99,7 @@ function ViewRecords() {
     }; 
     
     const getPublicKey = async (address) => {
-        let addr = EthersUtils.getAddress(address);
+        let addr = utils.getAddress(address);
         let result = await context.accManagerContract
                                 .getPublicKey(addr);
         return JSON.parse(result);
