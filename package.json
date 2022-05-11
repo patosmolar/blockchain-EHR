@@ -1,7 +1,0 @@
-{
-    "dependencies": {
-        "ipfs": "^0.62.2",
-        "react": "^18.0.0-rc.3",
-        "react-dom": "^18.0.0-rc.3"
-    }
-}
