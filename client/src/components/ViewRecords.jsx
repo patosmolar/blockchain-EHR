@@ -57,6 +57,7 @@ function ViewRecords() {
                                                                             myFileHash.path,
                                                                             patientsFileHash.path,
                                                                             mainFileOwner);
+                    navigate("/home");
                 } catch (error) {
                     alert("Užívateľ už vlastní zložku")
                 }
@@ -66,6 +67,7 @@ function ViewRecords() {
                                                                         myFileHash.path,
                                                                         patientsFileHash.path,
                                                                         mainFileOwner);
+                                                                        navigate("/home");
                 }catch(error){
                     if(error.data.includes("Not mainFile owner")){
                         alert("Niemáte práva pre editovanie zložky pacienta");

@@ -75,12 +75,12 @@ function Register() {
                     <Col className="xs">   
                     <Card>
                         <Card.Header>
-                            Zaregistrovať nového doktora
+                            Zaregistrovať nového lekára
                         </Card.Header>
                         <Card.Body>
                             <Form onSubmit={onRegisterDoctor}>
                                 <Form.Group  className="mb-3" controlId="formBasicEmail2">
-                                    <Form.Label>Adresa doktora</Form.Label>
+                                    <Form.Label>Adresa lekára</Form.Label>
                                     <Form.Control ref={doctorsAddressField} type="text" placeholder="0x16a..."/>
                                     <Form.Text className="text-muted">
                                     </Form.Text>

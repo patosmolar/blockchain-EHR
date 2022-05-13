@@ -19,6 +19,7 @@ function Home() {
     setLoading(true);
     try {
       var fileRaw = await getRawFileFromAddressPatient();
+      console.log(fileRaw);
       var keyIVData = await extractKeyIVDataFromRawFile(fileRaw, context.privateKey);
       var file = await aesDecrypt(keyIVData.data, keyIVData.key, keyIVData.IV);
       var rawFileString = arrayBufferToString(file);
@@ -92,11 +93,13 @@ function Home() {
       let path = await context.recordsContract.getMediacalRecordDoctor(address);
       const chunks = []
       for await (const chunk of context.ipfsClient.cat(path)) {
-        chunks.push(chunk)
+        chunks.push(chunk);
       }
+      console.log(chunks);
       return Buffer.concat(chunks);
     } catch (error) {
-      alert("Nemáte potrebné povolenie pre pacientovu zložku.");
+      console.log(error);
+      alert("Nepodarilo sa načítať zložku.");
       throw error;
     }
   };
@@ -158,7 +161,7 @@ if(role ==="DOCTOR_ROLE"){
   )
 }else{
   return(
-    <h2>Vitaj : {context.account}</h2>
+    <h2>Vitaj</h2>
   );
 }
 }
